@@ -6,7 +6,7 @@ $timings: ease-out;
   transition: border .2s $timings, color .1s $timings, background .2s $timings, rotate3d 0.2s $timings;
   text-align: left;
   height: 52px;
-  margin: 2px;
+  margin: 8px;
   cursor: pointer;
   color: #969696;
   background: none center center no-repeat;
@@ -16,7 +16,6 @@ $timings: ease-out;
   &.compact {
     min-width: 48px;
     text-align: center;
-    margin-left: 8px;
   }
 
   .person-link {
@@ -29,13 +28,13 @@ $timings: ease-out;
       position: relative;
       width: 43px;
       height: 48px;
-      clip-path: polygon(100% 0, 100% 83%, 50% 100%, 0 83%, 0 0);
-      //outline: 1px solid transparent;
-      //background-color: transparent;
+      //clip-path: polygon(100% 0, 100% 83%, 50% 100%, 0 83%, 0 0);
+      outline: 1px solid transparent;
+      background-color: transparent;
       overflow: hidden;
-      //min-height: 48px;
-      //min-width: 48px;
-      //border-radius: 50%;
+      min-height: 48px;
+      min-width: 48px;
+      border-radius: 50%;
       background-size: cover;
       border: 2px solid rgba(255, 255, 255, 0);
       transition: all .2s $timings;
@@ -80,47 +79,5 @@ $timings: ease-out;
       background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
       transform: translate3d(10%, 10%, 0) rotate3d(0, 0, 1, 90deg);
     }
-  }
-}
-//.avatar {
-//  composes: reset from '../../styles/global.pcss';
-//}
-.avatar.crest {
-  width: 43px;
-  height: 48px;
-  clip-path: polygon(100% 0, 100% 83%, 50% 100%, 0 83%, 0 0);
-  outline: 1px solid transparent;
-  background-color: transparent;
-  overflow: hidden;
-  > img {
-    position: relative;
-    width: 43px;
-    height: auto;
-  }
-}
-.avatar.round {
-  width: 42px;
-  height: 42px;
-  &.small {
-    width: 26px;
-    height: 26px;
-    border-radius: 13px;
-    img {
-      width: 26px;
-    }
-  }
-  &.medium {
-    width: 42px;
-    height: 42px;
-    border-radius: 21px;
-    img {
-      width: 42px;
-    }
-  }
-  overflow: hidden;
-  > img {
-    height: auto;
-    position: relative;
-    overflow: hidden;
   }
 }
