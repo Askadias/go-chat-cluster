@@ -1,0 +1,9 @@
+.socialBtn {
+  color: white;
+  font-weight: bold;
+}
+
+.facebookBtn {
+  @extend .socialBtn;
+  background-color: #4267b2;
+}

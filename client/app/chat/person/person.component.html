@@ -1,0 +1,43 @@
+<div class="person {{className}}"
+     [class.active]="active"
+     [class.compact]="compact"
+     fxLayout="row"
+     fxLayoutAlign="space-between center">
+  <a href="#"
+     (click)="click.listeners ? click.emit($event) : showPersonControls=!showPersonControls"
+     class="person-link"
+     fxLayout="row"
+     fxLayoutAlign="start center"
+     [fxFlex]="showPersonControls ? '54px' : ''">
+    <div class="avatar-container" fxFlex="48px">
+      <div class="mask"></div>
+      <img src="{{ avatar }}"
+           class="avatar"
+           *ngIf="avatar; else defaultAvatar"/>
+      <ng-template #defaultAvatar>
+        <img src="../../../assets/img/avatars/default-avatar.png" class="avatar"/>
+      </ng-template>
+    </div>
+    <div *ngIf="!compact && !showPersonControls"
+          [@fadeShiftAnimation]
+          fxFill
+          fxFlex="156px">
+      {{ name }}
+    </div>
+  </a>
+  <div class="person-controls"
+       *ngIf="!compact && showPersonControls"
+       [@fadeShiftAnimation]
+       fxLayout="row"
+       fxLayoutAlign="space-between center"
+       fxFlex>
+    <ng-content></ng-content>
+  </div>
+  <a href="#"
+     *ngIf="!compact && !showPersonControls && click.listeners"
+     (click)="showPersonControls=true"
+     [@fadeShiftAnimation]
+     class="person-controls-opener" fxFlex="26px">
+    <mat-icon class="md-24">more_vert</mat-icon>
+  </a>
+</div>

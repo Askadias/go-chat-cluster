@@ -1,0 +1,12 @@
+@import "../../../variables";
+
+.sidebar {
+  transition: all .2s ease-out;
+  height: 100%;
+  width: 220px;
+  background-color: $chat-grey-0;
+  &.fold {
+    width: 72px;
+  }
+}
+

@@ -1,0 +1,193 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/theming';
+@import "variables";
+
+@include mat-core();
+
+$chat-primary: mat-palette($mat-blue, 500);
+$chat-accent: mat-palette($mat-grey, 900);
+
+$chat-theme: mat-light-theme($chat-primary, $chat-accent);
+
+@include angular-material-theme($chat-theme);
+
+$chat-dark-theme-background: (
+  status-bar: black,
+  app-bar: map_get($mat-grey, 700),
+  background: map_get($mat-grey, 700),
+  hover: rgba(white, 0.04),
+  card: map_get($mat-grey, 700),
+  dialog: map_get($mat-grey, 700),
+  disabled-button: $white-12-opacity,
+  raised-button: map-get($mat-grey, 800),
+  focused-button: $white-6-opacity,
+  selected-button: map_get($mat-grey, 900),
+  selected-disabled-button: map_get($mat-grey, 800),
+  disabled-button-toggle: black,
+  unselected-chip: map_get($mat-grey, 700),
+  disabled-list-option: black,
+);
+
+@function chat-dark-theme($primary, $accent, $warn: mat-palette($mat-red, 500)) {
+  @return (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+    is-dark: true,
+    foreground: $mat-dark-theme-foreground,
+    background: $chat-dark-theme-background
+  );
+}
+
+.chat-theme {
+  $chat-primary: mat-palette($mat-blue, A400);
+  $chat-accent: mat-palette($mat-grey, 900);
+  $chat-warn: mat-palette($mat-red, 500);
+  $focused-label-color: mat-palette($mat-grey, 50);
+
+  $chat-bg-color: #202020;
+
+  &#accountPortalModalOverlay {
+    background-color: $chat-bg-color;
+  }
+
+  .mat-card {
+    background: rgba(0, 0, 0, 0.2) !important;
+    color: lighten($chat-bg-color, 40%) !important;
+    box-shadow: none !important;
+  }
+
+  .mat-progress-bar {
+    .mat-progress-bar-buffer {
+      background-color: $chat-bg-color;
+    }
+  }
+
+  .mat-progress-spinner {
+    circle {
+      stroke: white !important;
+    }
+  }
+
+  .mat-pseudo-checkbox {
+    transition: all 0.2s ease-in;
+    background-color: $chat-grey-3;
+    border: none;
+    &.mat-pseudo-checkbox-checked {
+      background: $chat-grey-5;
+    }
+    &::after {
+      transition: opacity 0.2s ease-in;
+      color: white !important;
+    }
+  }
+
+  // to disable selection
+  .no-selection {
+    .mat-pseudo-checkbox {
+      display: none;
+    }
+    .mat-list-item-content {
+      padding-left: 0 !important;
+    }
+  }
+  .not-selectable {
+    pointer-events: none;
+    cursor: default;
+    button {
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .mat-pseudo-checkbox {
+      visibility: hidden;
+    }
+  }
+  .mat-checkbox-frame {
+    border: none;
+    background-color: #2a2a2a;
+  }
+  .mat-checkbox-checkmark {
+    .mat-checkbox-checkmark-path {
+      stroke: white !important;
+    }
+  }
+
+  a {
+    color: white;
+  }
+  .mat-tab-links {
+    display: flex;
+    .mat-tab-link {
+      flex: 1 1 auto;
+      transition: all 0.2s ease-in;
+      &:hover {
+        background-color: #323232;
+      }
+    }
+  }
+  .mat-tab-nav-bar {
+    &.mat-primary {
+      .mat-tab-link {
+        &:not(.mat-tab-disabled):focus {
+          background-color: transparent !important;
+        }
+        &:not(.mat-tab-disabled):hover {
+          transition: all 0.2s ease-in;
+          background-color: lighten($chat-bg-color, 10%) !important;
+        }
+      }
+      .mat-ink-bar {
+        display: none;
+      }
+    }
+  }
+
+  * {
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+
+  //** Scrollbar **//
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #3b3b3b;
+    border-radius: 50px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #a9a9a9;
+    border-radius: 50px;
+  }
+
+  ::-webkit-scrollbar-thumb:horizontal:hover,
+  ::-webkit-scrollbar-thumb:vertical:hover {
+    background: #fff;
+  }
+
+  ::-webkit-scrollbar-track:hover {
+    background: #545454;
+  }
+
+  ::-webkit-scrollbar-button {
+    width: 8px;
+    height: 13px;
+    display: block;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
+  $chat-theme: chat-dark-theme($chat-primary, $chat-accent, $chat-warn);
+
+  @include angular-material-theme($chat-theme);
+}

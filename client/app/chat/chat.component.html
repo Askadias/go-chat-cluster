@@ -1,0 +1,14 @@
+<div fxLayoutWrap class="chat-theme chat">
+  <chat-sidebar [fold]="foldSocialBar" (mouseenter)="foldSocialBar = false">
+    <chat-person *ngFor="let friend of friends"
+                 [showPersonControls]="foldSocialBar"
+                 [avatar]="friend.avatarUrl" [name]="friend.name" [compact]="foldSocialBar">
+    </chat-person>
+  </chat-sidebar>
+  <div class="chat-content" (mouseenter)="foldSocialBar = true">
+    <button mat-raised-button fxFlex (click)="logout()" class="logout">
+      <mat-icon>exit_to_app</mat-icon>
+      Logout
+    </button>
+  </div>
+</div>
