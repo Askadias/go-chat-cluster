@@ -1,14 +1,54 @@
-<div fxLayoutWrap class="chat-theme chat">
+<div class="chat-theme chat">
   <chat-sidebar [fold]="foldSocialBar" (mouseenter)="foldSocialBar = false">
-    <chat-person *ngFor="let friend of friends"
-                 [showPersonControls]="foldSocialBar"
-                 [avatar]="friend.avatarUrl" [name]="friend.name" [compact]="foldSocialBar">
-    </chat-person>
+    <div>
+      <chat-person [showPersonControls]="foldSocialBar"
+                   [avatar]="profile.avatarUrl" [name]="profile.name" [compact]="foldSocialBar">
+        <button mat-raised-button (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          Sign Out
+        </button>
+      </chat-person>
+    </div>
+    <hr>
+    <div class="chat-groups">
+      <div class="chat-group" *ngFor="let chat of chats" [class.active]="isActiveChat(chat)" fxLayout="column">
+        <a (click)="switchToChat(chat)" *ngIf="!isActiveChat(chat)" class="chat-group-overlay-btn"></a>
+        <chat-person *ngFor="let friend of chat.participants"
+                     (click)="switchToChat(chat)"
+                     [avatar]="friend.avatarUrl"
+                     [name]="friend.name"
+                     [compact]="foldSocialBar">
+          <button mat-raised-button (click)="$event.stopPropagation(); chatWith(friend)">
+            <mat-icon>chat</mat-icon>
+            Chat
+          </button>
+          <button mat-raised-button (click)="$event.stopPropagation(); removeFromChat(chat, friend)">
+            <mat-icon>close</mat-icon>
+            Exclude
+          </button>
+        </chat-person>
+      </div>
+    </div>
+    <div class="friends">
+      <chat-person *ngFor="let friend of friends"
+                   [avatar]="friend.avatarUrl" [name]="friend.name" [compact]="foldSocialBar">
+        <button mat-raised-button (click)="chatWith(friend)">
+          <mat-icon>chat</mat-icon>
+          Chat
+        </button>
+        <button mat-raised-button (click)="addToCurrentChat(friend)"
+                *ngIf="canAddToCurrentChat(friend)">
+          <mat-icon>group_add</mat-icon>
+          Add
+        </button>
+      </chat-person>
+    </div>
   </chat-sidebar>
-  <div class="chat-content" (mouseenter)="foldSocialBar = true">
-    <button mat-raised-button fxFlex (click)="logout()" class="logout">
-      <mat-icon>exit_to_app</mat-icon>
-      Logout
-    </button>
+  <div class="chat-content" [class.social-bar-fold]="foldSocialBar" (mouseenter)="foldSocialBar = true">
+    <chat-room *ngIf="chatOpened"
+               [chat]="activeChat"
+               (close)="closeChat()"
+               (dismiss)="dismissChat(activeChat)"
+               (mouseenter)="foldSocialBar=true"></chat-room>
   </div>
 </div>

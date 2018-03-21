@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
 import * as jwt_decode from 'jwt-decode';
 import {Router} from "@angular/router";
+import {User} from "../domain/user";
 
 export const ACCESS_TOKEN: string = 'JWT';
 export const USER_NAME: string = 'USER_NAME';
@@ -27,6 +28,10 @@ export class AuthService {
 
   getToken(): string {
     return localStorage.getItem(ACCESS_TOKEN);
+  }
+
+  getProfile(): User {
+    return {name: localStorage.getItem(USER_NAME), avatarUrl: localStorage.getItem(AVATAR_URL)}
   }
 
   setToken(token: string): void {

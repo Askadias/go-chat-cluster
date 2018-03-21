@@ -1,3 +1,51 @@
 .chat {
   height: 100%;
+  .chat-content {
+    transition: all .1s ease-out;
+    height: 100%;
+    width: calc(100% - 300px);
+    background-color: #2a2a2a;
+    border-right: 1px solid #666;
+    right: 0;
+    top: 0;
+    left: 300px;
+    bottom: 0;
+    position: absolute;
+    &.social-bar-fold {
+      width: calc(100% - 72px);
+      left: 72px;
+    }
+  }
+}
+
+.chat-group {
+  transition: all 0.2s ease-in;
+  background-color: #2a2a2a;
+  border: 1px solid #666;
+  border-radius: 20px;
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  &.active {
+    border-left: transparent;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    right: -1px;
+  }
+  .chat-group-overlay-btn {
+    transition: all 0.2s ease-in;
+    cursor: pointer;
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: -1px;
+    right: -1px;
+    border: 1px solid #666;
+    z-index: 1;
+    border-radius: 20px;
+    &:hover {
+      color: white;
+      border-color: white;
+    }
+  }
 }

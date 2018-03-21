@@ -1,11 +1,13 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation} from '@angular/core';
 import {fadeShiftAnimation} from '../../animations/fade-shift.animation';
+import {scaleAnimation} from "../../animations/scale.animation";
 
 @Component({
   selector: 'chat-person',
   templateUrl: './person.component.html',
   styleUrls: ['./person.component.scss'],
-  animations: [fadeShiftAnimation]
+  encapsulation: ViewEncapsulation.None,
+  animations: [fadeShiftAnimation, scaleAnimation]
 })
 export class PersonComponent {
   @Input() className = '';

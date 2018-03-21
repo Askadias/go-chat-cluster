@@ -3,8 +3,10 @@
 .sidebar {
   transition: all .2s ease-out;
   height: 100%;
-  width: 220px;
+  width: 300px;
   background-color: $chat-grey-0;
+  position: relative;
+  overflow: hidden;
   &.fold {
     width: 72px;
   }

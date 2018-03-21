@@ -12,13 +12,23 @@ $timings: ease-out;
   background: none center center no-repeat;
   background-size: cover;
   display: block;
+  width: 100%;
 
   &.compact {
     min-width: 48px;
     text-align: center;
   }
 
+
+  //.person-name {
+  //  position: absolute;
+  //  top: 0;
+  //  right: 0;
+  //  bottom: 0;
+  //  left: 60px;
+  //}
   .person-link {
+    position: relative;
     text-decoration: none;
     color: #969696;
     transition: all .2s $timings;
@@ -28,7 +38,6 @@ $timings: ease-out;
       position: relative;
       width: 43px;
       height: 48px;
-      //clip-path: polygon(100% 0, 100% 83%, 50% 100%, 0 83%, 0 0);
       outline: 1px solid transparent;
       background-color: transparent;
       overflow: hidden;
@@ -48,6 +57,10 @@ $timings: ease-out;
     }
     .person-name {
       vertical-align: middle;
+      transition: all .2s $timings;
+      &.extinguished {
+        opacity: 0.2;
+      }
     }
   }
   .person-link .avatar-container .mask {
@@ -60,6 +73,11 @@ $timings: ease-out;
     background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5));
   }
   .person-controls {
+    position: absolute;
+    top: 0;
+    right: 8px;
+    bottom: 0;
+    left: 52px;
     transition: all .2s $timings;
   }
   .person-controls-opener {
