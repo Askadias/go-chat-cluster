@@ -11,6 +11,17 @@
     left: 300px;
     bottom: 0;
     position: absolute;
+
+    .chat-bg {
+      position: absolute;
+      top: 0;
+      left: 2px;
+      right: 0;
+      bottom: 0;
+      background: url(../../assets/img/chat-logo.png) no-repeat center center;
+      background-size: 186px auto;
+      opacity: 1;
+    }
     &.social-bar-fold {
       width: calc(100% - 72px);
       left: 72px;
@@ -18,19 +29,45 @@
   }
 }
 
+.person-control-grp-btn {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(to left, #2a2a2a 80%, transparent 100%);
+}
+
+.person-control-btn {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(to left, #121212 80%, transparent 100%);
+}
+
+.friends-filter-input {
+  margin: 0 10px;
+  width: calc(100% - 20px);
+  color: white;
+  &.fold {
+    margin: 0;
+    width: 100%;
+  }
+}
+
 .chat-group {
   transition: all 0.2s ease-in;
-  background-color: #2a2a2a;
+  background-color: #333;
   border: 1px solid #666;
   border-radius: 20px;
   position: relative;
   display: inline-flex;
   width: 100%;
+  opacity: 0.5;
+  margin: 5px 0;
   &.active {
     border-left: transparent;
+    background-color: #2a2a2a;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     right: -1px;
+    opacity: 1;
   }
   .chat-group-overlay-btn {
     transition: all 0.2s ease-in;

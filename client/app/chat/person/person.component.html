@@ -20,16 +20,16 @@
     </div>
     <div *ngIf="!compact"
          class="person-name"
-         [class.extinguished]="showPersonControls"
+         [class.highlight]="showPersonControls"
           [@fadeShiftAnimation]>
       {{ name }}
     </div>
   </a>
   <div class="person-controls"
        *ngIf="!compact && showPersonControls"
-       [@scaleAnimation]
+       [@fadeAnimation]
        fxLayout="row"
-       fxLayoutAlign="space-around center"
+       fxLayoutAlign="end center"
        fxFlex>
     <ng-content></ng-content>
   </div>

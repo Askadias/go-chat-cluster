@@ -6,7 +6,7 @@ $timings: ease-out;
   transition: border .2s $timings, color .1s $timings, background .2s $timings, rotate3d 0.2s $timings;
   text-align: left;
   height: 52px;
-  margin: 8px;
+  margin: 0;
   cursor: pointer;
   color: #969696;
   background: none center center no-repeat;
@@ -38,7 +38,6 @@ $timings: ease-out;
       position: relative;
       width: 43px;
       height: 48px;
-      outline: 1px solid transparent;
       background-color: transparent;
       overflow: hidden;
       min-height: 48px;
@@ -58,8 +57,12 @@ $timings: ease-out;
     .person-name {
       vertical-align: middle;
       transition: all .2s $timings;
+      min-width: 238px;
       &.extinguished {
         opacity: 0.2;
+      }
+      &.highlight {
+        color: white;
       }
     }
   }

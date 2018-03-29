@@ -1,8 +1,8 @@
 import {AfterViewChecked, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FormControl, Validators} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 import {ChatMessage} from '../../domain/chat-message';
 import {User} from '../../domain/user';
-import {Chat} from '../../domain/chat';
+import {ChatRoom} from '../../domain/chat-room';
 
 @Component({
   selector: 'chat-room',
@@ -12,10 +12,10 @@ import {Chat} from '../../domain/chat';
 export class RoomComponent implements OnInit, AfterViewChecked {
 
   @Input() className = '';
-  @Input() chat: Chat;
+  @Input() room: ChatRoom;
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
   @Output() dismiss: EventEmitter<any> = new EventEmitter<any>();
-  messageInput = new FormControl('', [Validators.required]);
+  messageInput = new FormControl('', []);
 
   @ViewChild('chatLogElement') private chatLogContainer: ElementRef;
 
@@ -31,16 +31,16 @@ export class RoomComponent implements OnInit, AfterViewChecked {
   }
 
   sendMessage() {
-    if (this.messageInput.valid) {
-      this.chat.chatLog.push(new ChatMessage(Date.now(), this.chat.newMessage, this.chat.me.id));
-      this.chat.newMessage = '';
+    if (this.messageInput.valid && this.room.newMessage !== '') {
+      this.room.chatLog.push(new ChatMessage(this.room.id, this.room.me.id, this.room.newMessage, new Date()));
+      this.room.newMessage = '';
       this.scrollToBottom();
-      this.chat.receiveMessageFromRandomParticipantIn(Math.floor((Math.random() * 10) + 1));
+      this.room.receiveMessageFromRandomParticipantIn(Math.floor((Math.random() * 10) + 1));
     }
   }
 
   getUser(accountId: string): User {
-    return this.chat.accounts.get(accountId);
+    return this.room.accounts.get(accountId);
   }
 
   getAvatar(accountId: string): string {
@@ -49,8 +49,8 @@ export class RoomComponent implements OnInit, AfterViewChecked {
   }
 
   isHeadMessage(chatMessage: ChatMessage, index: number) {
-    return (this.chat.chatLog.length === index + 1) // last message
-      || this.chat.chatLog[index + 1].from !== this.chat.chatLog[index].from;
+    return (this.room.chatLog.length === index + 1) // last message
+      || this.room.chatLog[index + 1].from !== this.room.chatLog[index].from;
   }
 
   scroll(): void {

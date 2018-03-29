@@ -40,7 +40,7 @@ $chat-dark-theme-background: (
 }
 
 .chat-theme {
-  $chat-primary: mat-palette($mat-blue, A400);
+  $chat-primary: mat-palette($mat-blue, 400);
   $chat-accent: mat-palette($mat-grey, 900);
   $chat-warn: mat-palette($mat-red, 500);
   $focused-label-color: mat-palette($mat-grey, 50);

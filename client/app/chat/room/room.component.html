@@ -11,9 +11,9 @@
   <div class="chat-log-container">
     <div class="chat-log">
       <div class="chat-messages" #chatLogElement>
-        <div *ngFor="let chatMessage of chat.chatLog; let i = index"
+        <div *ngFor="let chatMessage of room.chatLog; let i = index"
              class="chat-message"
-             [class.mine]="chatMessage.from == chat.me.id"
+             [class.mine]="chatMessage.from == room.me.id"
              [class.head]="isHeadMessage(chatMessage, i)">
           <div class="chat-message-from">
             <div class="chat-avatar-container" fxFlex="48px" *ngIf="isHeadMessage(chatMessage, i)">
@@ -41,7 +41,7 @@
         <input matInput id="message" name="message"
                placeholder="Message"
                [formControl]="messageInput"
-               [(ngModel)]="chat.newMessage">
+               [(ngModel)]="room.newMessage">
       </mat-form-field>
       <button class="flat-button chat-send-btn" (click)="sendMessage()">
         <mat-icon class="md-24">send</mat-icon>

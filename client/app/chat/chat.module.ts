@@ -15,6 +15,7 @@ import {RoomComponent} from "./room/room.component";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
+import {FriendsFilterPipe} from "./friends-filter.pipe";
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import {MatInputModule} from "@angular/material/input";
     PersonComponent,
     SidebarComponent,
     ChatComponent,
-    RoomComponent
+    RoomComponent,
+    FriendsFilterPipe
   ],
   imports: [
     CommonModule,

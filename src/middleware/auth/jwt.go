@@ -1,4 +1,4 @@
-package middleware
+package auth
 
 import (
   "context"
@@ -62,7 +62,7 @@ func OnError(w http.ResponseWriter, err string) {
 }
 
 // New constructs a new Secure instance with supplied options.
-func New(options ...Options) *JWTMiddleware {
+func NewJwtMiddleware(options ...Options) *JWTMiddleware {
 
   var opts Options
   if len(options) == 0 {
@@ -105,8 +105,17 @@ func FromAuthHeader(r *http.Request) (string, error) {
   if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
     return "", errors.New("authorization header format must be Bearer {token}")
   }
-
   return authHeaderParts[1], nil
+}
+
+// FromJWTCookie is a "TokenExtractor" that takes a give request and extracts
+// the JWT token from the JWT cookie.
+func FromJWTCookie(r *http.Request) (string, error) {
+  authCookie, err := r.Cookie("JWT")
+  if err != nil {
+    return "", err
+  }
+  return authCookie.Value, nil
 }
 
 func (m *JWTMiddleware) CheckJWT(w http.ResponseWriter, c martini.Context, r *http.Request) {

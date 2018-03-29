@@ -4,7 +4,7 @@ import {ActivatedRoute} from "@angular/router";
 import {ChatService} from "../services/chat.service";
 import {User} from "../domain/user";
 import {AuthService} from "../services/auth.service";
-import {Chat} from "../domain/chat";
+import {ChatRoom} from "../domain/chat-room";
 
 @Component({
   selector: 'chat-component',
@@ -17,8 +17,8 @@ export class ChatComponent implements OnInit {
   errors: string[] = [];
   profile: User;
   friends: User[] = [];
-  chats: Chat[] = [];
-  activeChat: Chat;
+  chats: ChatRoom[] = [];
+  activeRoom: ChatRoom;
   loading = false;
   foldSocialBar = false;
   chatOpened = false;
@@ -29,7 +29,7 @@ export class ChatComponent implements OnInit {
     this.oauthConfig = env.oauth;
     this.loading = true;
     this.profile = auth.getProfile();
-    this.activeChat = new Chat(this.profile, null);
+    this.activeRoom = new ChatRoom(this.profile, null);
     this.chat.getFriends().subscribe(
       (friends) => {
         this.loading = false;
@@ -42,6 +42,46 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.chat.getEventListener().subscribe(event => {
+      if (event.type === 'message') {
+        let data = event.data.content;
+        if (event.data.roomId) {
+          const targetChat = this.chats.find((chat) =>
+            chat.id === event.data.roomId
+          );
+          if (targetChat) {
+            let senderId = event.data.sender;
+            if (senderId) {
+              let sender = targetChat.participants.find((user) =>
+                user.id === senderId
+              );
+              if (sender) {
+                targetChat.onMessageReceive(data, sender.id)
+              }
+            }
+          }
+        }
+      }
+      if(event.type == "close") {
+        if (event.data.roomId) {
+          const targetChat = this.chats.find((chat) =>
+            chat.id === event.data.roomId
+          );
+          if (targetChat) {
+            let senderId = event.data.sender;
+            if (senderId) {
+              let sender = targetChat.participants.find((user) =>
+                user.id === senderId
+              );
+              this.removeFromChat(targetChat, sender)
+            }
+          }
+        }
+      }
+      if(event.type == "open") {
+        // this.messages.push("/The socket connection has been established");
+      }
+    })
   }
 
   logout() {
@@ -54,21 +94,21 @@ export class ChatComponent implements OnInit {
       && chat.participants[0].id === friend.id
     );
     if (existingChat) {
-      if (this.activeChat.id !== existingChat.id) {
+      if (this.activeRoom.id !== existingChat.id) {
         this.switchToChat(existingChat)
       }
     } else {
-      let newChat = new Chat(this.profile, friend);
+      let newChat = new ChatRoom(this.profile, friend);
       this.chats.push(newChat);
       this.switchToChat(newChat)
     }
   }
 
   addToCurrentChat(friend: User) {
-    this.activeChat.addParticipant(friend)
+    this.activeRoom.addParticipant(friend)
   }
 
-  removeFromChat(chat: Chat, friend: User) {
+  removeFromChat(chat: ChatRoom, friend: User) {
     if (chat.participants.length === 1) {
       this.dismissChat(chat);
     } else {
@@ -76,31 +116,35 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  isActiveChat(chat: Chat) {
-    return this.activeChat && chat.id === this.activeChat.id;
+  isActiveChat(chat: ChatRoom) {
+    return this.activeRoom && chat.id === this.activeRoom.id;
   }
 
-  switchToChat(chat: Chat) {
-    this.activeChat = chat;
+  switchToChat(chat: ChatRoom) {
+    this.activeRoom = chat;
     this.chatOpened = true;
   }
 
   canAddToCurrentChat(friend: Account) {
-    return this.activeChat.participants.length > 0 && !this.activeChat.accounts.has(friend.id);
+    return this.activeRoom.participants.length > 0 && !this.activeRoom.accounts.has(friend.id);
   }
 
   closeChat() {
     this.chatOpened = false;
-    this.activeChat = new Chat(this.profile, null);
+    this.activeRoom = new ChatRoom(this.profile, null);
   }
 
-  dismissChat(chat: Chat) {
+  dismissChat(chat: ChatRoom) {
     this.chats.splice(
       this.chats.findIndex((it) => it.id === chat.id),
       1
     );
-    if (this.activeChat.id === chat.id) {
+    if (this.activeRoom.id === chat.id) {
       this.closeChat();
     }
+  }
+
+  trackByUserId(index: number, friend: User): string {
+    return friend.id;
   }
 }

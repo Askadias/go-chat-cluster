@@ -3,52 +3,49 @@
     <div>
       <chat-person [showPersonControls]="foldSocialBar"
                    [avatar]="profile.avatarUrl" [name]="profile.name" [compact]="foldSocialBar">
-        <button mat-raised-button (click)="logout()">
-          <mat-icon>exit_to_app</mat-icon>
-          Sign Out
+        <button class="flat-button person-control-btn" (click)="logout()">
+          <mat-icon class="md-36">exit_to_app</mat-icon>
         </button>
       </chat-person>
     </div>
-    <hr>
     <div class="chat-groups">
       <div class="chat-group" *ngFor="let chat of chats" [class.active]="isActiveChat(chat)" fxLayout="column">
         <a (click)="switchToChat(chat)" *ngIf="!isActiveChat(chat)" class="chat-group-overlay-btn"></a>
         <chat-person *ngFor="let friend of chat.participants"
-                     (click)="switchToChat(chat)"
+                     (click)="!isActiveChat(chat) ? switchToChat(chat) : chatWith(friend)"
                      [avatar]="friend.avatarUrl"
                      [name]="friend.name"
                      [compact]="foldSocialBar">
-          <button mat-raised-button (click)="$event.stopPropagation(); chatWith(friend)">
-            <mat-icon>chat</mat-icon>
-            Chat
-          </button>
-          <button mat-raised-button (click)="$event.stopPropagation(); removeFromChat(chat, friend)">
-            <mat-icon>close</mat-icon>
-            Exclude
+          <button class="flat-button person-control-grp-btn"
+                  (click)="$event.stopPropagation(); removeFromChat(chat, friend)"
+                  *ngIf="chat.amIOwner()">
+            <mat-icon class="md-36">close</mat-icon>
           </button>
         </chat-person>
       </div>
     </div>
+    <mat-form-field (disabled)="foldSocialBar" [class.fold]="foldSocialBar"
+                    class="friends-filter-input" floatLabel="never">
+      <input matInput #nameFilter placeholder="Friends">
+    </mat-form-field>
     <div class="friends">
-      <chat-person *ngFor="let friend of friends"
-                   [avatar]="friend.avatarUrl" [name]="friend.name" [compact]="foldSocialBar">
-        <button mat-raised-button (click)="chatWith(friend)">
-          <mat-icon>chat</mat-icon>
-          Chat
-        </button>
-        <button mat-raised-button (click)="addToCurrentChat(friend)"
-                *ngIf="canAddToCurrentChat(friend)">
-          <mat-icon>group_add</mat-icon>
-          Add
+      <chat-person *ngFor="let friend of friends | friendsFilter:nameFilter.value; trackBy: trackByUserId"
+                   (click)="chatWith(friend)"
+                   [avatar]="friend.avatarUrl"
+                   [name]="friend.name" [compact]="foldSocialBar">
+        <button class="flat-button person-control-btn" *ngIf="canAddToCurrentChat(friend)"
+                (click)="$event.stopPropagation(); addToCurrentChat(friend)">
+          <mat-icon class="md-36">add</mat-icon>
         </button>
       </chat-person>
     </div>
   </chat-sidebar>
   <div class="chat-content" [class.social-bar-fold]="foldSocialBar" (mouseenter)="foldSocialBar = true">
+    <div class="chat-bg"></div>
     <chat-room *ngIf="chatOpened"
-               [chat]="activeChat"
+               [room]="activeRoom"
                (close)="closeChat()"
-               (dismiss)="dismissChat(activeChat)"
+               (dismiss)="dismissChat(activeRoom)"
                (mouseenter)="foldSocialBar=true"></chat-room>
   </div>
 </div>

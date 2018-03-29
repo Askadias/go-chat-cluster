@@ -4,6 +4,7 @@ import {Observable} from 'rxjs/Observable';
 import * as jwt_decode from 'jwt-decode';
 import {Router} from "@angular/router";
 import {User} from "../domain/user";
+import {CookieService} from "ngx-cookie-service";
 
 export const ACCESS_TOKEN: string = 'JWT';
 export const USER_NAME: string = 'USER_NAME';
@@ -12,13 +13,14 @@ export const AVATAR_URL: string = 'AVATAR_URL';
 @Injectable()
 export class AuthService {
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, private cookies: CookieService) {
   }
 
   logout() {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(USER_NAME);
     localStorage.removeItem(AVATAR_URL);
+    this.cookies.delete(ACCESS_TOKEN);
     this.router.navigate(['/login']);
   }
 
@@ -39,6 +41,7 @@ export class AuthService {
     localStorage.setItem(USER_NAME, decoded.iss);
     localStorage.setItem(AVATAR_URL, decoded.avatar);
     localStorage.setItem(ACCESS_TOKEN, token);
+    this.cookies.set(ACCESS_TOKEN, token, this.getTokenExpirationDate(token), '/')
   }
 
   getTokenExpirationDate(token: string): Date {

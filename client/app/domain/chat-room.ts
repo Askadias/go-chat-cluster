@@ -2,9 +2,10 @@ import {ChatMessage} from './chat-message';
 import {User} from './user';
 import {v4 as uuid} from 'uuid';
 
-export class Chat {
+export class ChatRoom {
   id: string;
   me: User;
+  owner: User;
   participants: User[] = [];
   chatLog: ChatMessage[];
   newMessage = '';
@@ -13,6 +14,7 @@ export class Chat {
 
   constructor(me: User, participant: User, chatLog: ChatMessage[] = []) {
     this.me = me;
+    this.owner = me;
     if (participant) {
       this.participants = [participant];
     }
@@ -46,6 +48,10 @@ export class Chat {
   }
 
   onMessageReceive(message: string, accountId: string) {
-    this.chatLog.push(new ChatMessage(Date.now(), message, accountId));
+    this.chatLog.push(new ChatMessage(this.id, accountId, message, new Date()));
+  }
+
+  amIOwner() {
+    return this.me.id == this.owner.id
   }
 }

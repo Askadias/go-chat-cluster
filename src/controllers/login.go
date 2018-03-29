@@ -16,13 +16,13 @@ type UserClaims struct {
   jwt.StandardClaims
 }
 
-func LoginWithProvider(extAuth models.ExtAuthCredentials, render render.Render) {
-  accessToken, err := services.Facebook.GetAccessToken(extAuth.Code)
+func LoginWithProvider(extAuth models.ExtAuthCredentials, render render.Render, facebook *services.Facebook) {
+  accessToken, err := facebook.GetAccessToken(extAuth.Code)
   if err != nil {
     render.JSON(err.HttpCode, err)
     return
   }
-  profile, err := services.Facebook.GetProfile(accessToken)
+  profile, err := facebook.GetProfile(accessToken)
   if err != nil {
     render.JSON(err.HttpCode, err)
     return
@@ -41,11 +41,11 @@ func LoginWithProvider(extAuth models.ExtAuthCredentials, render render.Render) 
   }
 
   tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-  signedJWT, e := tkn.SignedString(jwtSignKey)
-  if e != nil {
-    render.JSON(http.StatusInternalServerError, conf.NewApiError(e))
-    return
+
+  if signedJWT, err := tkn.SignedString(jwtSignKey); err != nil {
+    render.JSON(http.StatusInternalServerError, conf.NewApiError(err))
+  } else {
+    log.Println("JWT issued:", signedJWT, "error:", err)
+    render.JSON(http.StatusOK, map[string]string{"token": signedJWT})
   }
-  log.Println("JWT issued:", signedJWT, "error:", err)
-  render.JSON(http.StatusOK, map[string]string{"token": signedJWT})
 }

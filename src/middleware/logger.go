@@ -9,7 +9,7 @@ import (
   "reflect"
 )
 
-// Logger returns a middleware handler that logs the request as it goes in and the response as it goes out.
+/* Logger returns a middleware handler that logs the request as it goes in and the response as it goes out. */
 func Logger() martini.Handler {
   return func(res http.ResponseWriter, req *http.Request, c martini.Context, log *log.Logger) {
     start := time.Now()

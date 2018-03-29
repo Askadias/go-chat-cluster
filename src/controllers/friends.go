@@ -8,16 +8,16 @@ import (
   "conf"
 )
 
-func GetFriends(req *http.Request, render render.Render) {
+func GetFriends(req *http.Request, render render.Render, facebook *services.Facebook) {
   tkn := req.Context().Value("user").(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"]
-    friends, err := services.Facebook.GetFriends(profileID.(string))
-    if err != nil {
+
+    if friends, err := facebook.GetFriends(profileID.(string)); err != nil {
       render.JSON(err.HttpCode, err)
-      return
+    } else {
+      render.JSON(http.StatusOK, friends)
     }
-    render.JSON(http.StatusOK, friends)
   } else {
     render.JSON(http.StatusUnauthorized, conf.ErrInvalidToken)
   }

@@ -1,11 +1,15 @@
 export class ChatMessage {
+  roomId: string;
   from: string;
-  timestamp: number;
-  message: string;
+  timestamp: Date;
+  body: string;
+  type: string;
 
-  constructor(timestamp: number, message: string, from: string) {
-    this.timestamp = timestamp;
-    this.message = message;
+  constructor(roomId: string, from: string, body: string, timestamp: Date, type?: string) {
+    this.roomId = roomId;
     this.from = from;
+    this.body = body;
+    this.timestamp = timestamp;
+    this.type = type || 'msg';
   }
 }

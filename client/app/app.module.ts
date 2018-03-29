@@ -19,6 +19,7 @@ import {AuthService} from "./services/auth.service";
 import {ChatService} from "./services/chat.service";
 import {AuthGuard} from "./login/auth.guard";
 import {AuthInterceptor} from "./login/auth-interceptor";
+import {CookieService} from "ngx-cookie-service";
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import {AuthInterceptor} from "./login/auth-interceptor";
     HttpClientXsrfModule
   ],
   providers: [
+    CookieService,
     AuthGuard,
     AuthService,
     ChatService,
