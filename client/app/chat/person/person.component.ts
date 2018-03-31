@@ -1,7 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ViewEncapsulation} from '@angular/core';
 import {fadeShiftAnimation} from '../../animations/fade-shift.animation';
 import {scaleAnimation} from "../../animations/scale.animation";
 import {fadeAnimation} from "../../animations/fade.animation";
+import {User} from "../../domain/user";
 
 @Component({
   selector: 'chat-person',
@@ -12,8 +13,7 @@ import {fadeAnimation} from "../../animations/fade.animation";
 })
 export class PersonComponent {
   @Input() className = '';
-  @Input() avatar = '';
-  @Input() name = '';
+  @Input() person: User;
   @Input() active = false;
   @Input() compact = false;
   @Output() click: EventEmitter<any> = new EventEmitter<any>();

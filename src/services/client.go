@@ -4,12 +4,15 @@ import (
   "github.com/gorilla/websocket"
   "encoding/json"
   "models"
+  "log"
+  "db"
 )
 
 type Client struct {
-  Id     string
-  Socket *websocket.Conn
-  Send   chan []byte
+  Id      string
+  Socket  *websocket.Conn
+  Send    chan []byte
+  ChatLog db.ChatLog
 }
 
 func (c *Client) Read() {
@@ -25,8 +28,15 @@ func (c *Client) Read() {
       c.Socket.Close()
       break
     }
-    jsonMessage, _ := json.Marshal(&models.Message{From: c.Id, Body: string(message)})
+    log.Println("Message received:", string(message))
+    msg := models.Message{}
+    json.Unmarshal(message, &msg)
+    msg.From = c.Id
+    jsonMessage, _ := json.Marshal(&msg)
     ChatManager.Broadcast <- jsonMessage
+    if msg.Type != "update" {
+      c.ChatLog.AddMessage(msg)
+    }
   }
 }
 

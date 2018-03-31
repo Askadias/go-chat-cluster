@@ -15,6 +15,7 @@ import (
   "services"
   "middleware"
   "middleware/auth"
+  "db"
 )
 
 var jwtOptions = auth.Options{
@@ -34,10 +35,12 @@ var fbOptions = services.FBOptions{
   TimeoutMS:    conf.FBTimeoutMS,
 }
 
-var chatDBOptions = services.ChatDBOptions{
-  MongoURL:     conf.MongoURL,
-  MongoDBName:  conf.MongoDBName,
-  MongoTimeout: conf.MongoTimeout,
+var chatDBOptions = db.ChatDBOptions{
+  MongoURL:       conf.MongoURL,
+  MongoDBName:    conf.MongoDBName,
+  MongoTimeout:   conf.MongoTimeout,
+  MaxChatMembers: conf.MaxChatMembers,
+  MaxOpenedChats: conf.MaxOpenedChats,
 }
 
 func main() {
@@ -73,21 +76,25 @@ func main() {
 
   // Injecting Services
   facebook := services.NewFacebook(fbOptions)
-  chatDBOptions.Facebook = facebook
-  chat := services.NewChat(chatDBOptions)
-  m.Map(facebook)
-  m.Map(chat)
+  chat := db.NewMongoChat(chatDBOptions)
+  m.MapTo(facebook, (*services.OAuth)(nil))
+  m.MapTo(facebook, (*services.Account)(nil))
+  m.MapTo(facebook, (*services.Friends)(nil))
+  m.MapTo(chat, (*db.Chat)(nil))
+  m.MapTo(chat, (*db.ChatLog)(nil))
 
   // API Routes
   m.Use(render.Renderer())
   router.Group("/api", func(r martini.Router) {
     r.Get("/friends", jwtMiddleware.CheckJWT, controllers.GetFriends)
+    r.Get("/users", jwtMiddleware.CheckJWT, controllers.GetUsers)
+    r.Get("/users/:id", jwtMiddleware.CheckJWT, controllers.GetUser)
     r.Get("/rooms", jwtMiddleware.CheckJWT, controllers.GetRooms)
-    r.Post("/rooms", binding.Bind(models.ChatRoom{}), jwtMiddleware.CheckJWT, controllers.CreateRoom)
+    r.Post("/rooms", binding.Bind(models.Room{}), jwtMiddleware.CheckJWT, controllers.CreateRoom)
     r.Get("/rooms/:id", jwtMiddleware.CheckJWT, controllers.GetRoom)
     r.Delete("/rooms/:id", jwtMiddleware.CheckJWT, controllers.DeleteRoom)
-    r.Post("/rooms/:id/members/:memberId", jwtMiddleware.CheckJWT, controllers.AddRoomMember)
-    r.Delete("/rooms/:id/members/:memberId", jwtMiddleware.CheckJWT, controllers.RemoveRoomMember)
+    r.Post("/rooms/:id/members/:memberID", jwtMiddleware.CheckJWT, controllers.AddRoomMember)
+    r.Delete("/rooms/:id/members/:memberID", jwtMiddleware.CheckJWT, controllers.RemoveRoomMember)
     r.Get("/rooms/:id/log", jwtMiddleware.CheckJWT, controllers.GetChatLog)
     r.Post("/rooms/:id/log", binding.Bind(models.Message{}), jwtMiddleware.CheckJWT, controllers.LogMessage)
     r.Post("/login/:provider", binding.Bind(models.ExtAuthCredentials{}), controllers.LoginWithProvider)

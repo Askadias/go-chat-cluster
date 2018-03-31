@@ -2,7 +2,9 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
 import {AuthService} from "./auth.service";
-import {ChatMessage} from "../domain/chat-message";
+import {Message} from "../domain/message";
+import {Room} from "../domain/room";
+import {User} from "../domain/user";
 
 @Injectable()
 export class ChatService {
@@ -24,15 +26,35 @@ export class ChatService {
     };
   }
 
-  getFriends(): Observable<any> {
-    return this.http.get<any>('/api/friends');
+  getChatLog(roomId: string, from: number, limit: number): Observable<Message[]> {
+    return this.http.get<Message[]>(`/api/rooms/${roomId}/log?from${from}&limit=${limit}`);
   }
 
-  getChatLog(roomId: string, from: number, limit: number): Observable<ChatMessage[]> {
-    return this.http.get<ChatMessage[]>(`/api/rooms/${roomId}/log?from${from}&limit=${limit}`);
+  newRoom(room: Room): Observable<Room> {
+    return this.http.post<Room>(`/api/rooms`, room);
   }
 
-  send(message: ChatMessage) {
+  addMember(roomId: string, memberId: string): Observable<any> {
+    return this.http.post(`/api/rooms/${roomId}/members/${memberId}`, {});
+  }
+
+  kickMember(roomId: string, memberId: string): Observable<any> {
+    return this.http.delete(`/api/rooms/${roomId}/members/${memberId}`);
+  }
+
+  getRooms(): Observable<Room[]> {
+    return this.http.get<Room[]>(`/api/rooms`);
+  }
+
+  getRoom(roomId: string): Observable<Room> {
+    return this.http.get<Room>(`/api/rooms/${roomId}`);
+  }
+
+  deleteRoom(roomId: string): Observable<any> {
+    return this.http.delete(`/api/rooms/${roomId}`);
+  }
+
+  send(message: Message) {
     this.socket.send(JSON.stringify(message));
   }
 

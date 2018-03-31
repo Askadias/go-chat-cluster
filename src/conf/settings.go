@@ -17,6 +17,8 @@ var JWTUserPropName string
 var MongoURL string
 var MongoDBName string
 var MongoTimeout time.Duration
+var MaxChatMembers int
+var MaxOpenedChats int
 var FBClientID string
 var FBClientSecret string
 var FBRedirectURL string
@@ -37,6 +39,8 @@ func init() {
     MongoURL = os.Getenv("MONGO_URL")
     MongoDBName = os.Getenv("MONGO_DB_NAME")
     MongoTimeout = 1 * time.Second
+    MaxChatMembers = 100
+    MaxOpenedChats = 10
     FBClientID = "180253089366075"
     FBClientSecret = "e89384a22b77d638b8b2ba4ec1d458e1"
     FBRedirectURL = "http://localhost:3000/authorized"

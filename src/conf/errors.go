@@ -27,4 +27,6 @@ var (
   ErrInvalidId            = &ApiError{7, http.StatusBadRequest, "Invalid id specified"}
   ErrNotFound             = &ApiError{8, http.StatusNotFound, "Nothing to update"}
   ErrAlreadyExists        = &ApiError{9, http.StatusBadRequest, "Already exists"}
+  ErrTooManyMembers       = &ApiError{10, http.StatusBadRequest, "Too many members"}
+  ErrTooManyChatsOpened   = &ApiError{11, http.StatusBadRequest, "Too many rooms opened"}
 )

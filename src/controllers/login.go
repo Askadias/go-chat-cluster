@@ -16,18 +16,18 @@ type UserClaims struct {
   jwt.StandardClaims
 }
 
-func LoginWithProvider(extAuth models.ExtAuthCredentials, render render.Render, facebook *services.Facebook) {
-  accessToken, err := facebook.GetAccessToken(extAuth.Code)
+func LoginWithProvider(extAuth models.ExtAuthCredentials, render render.Render, oauth services.OAuth, account services.Account) {
+  accessToken, err := oauth.ExchangeCodeToToken(extAuth.Code)
   if err != nil {
     render.JSON(err.HttpCode, err)
     return
   }
-  profile, err := facebook.GetProfile(accessToken)
+  profile, err := account.GetProfile(accessToken)
   if err != nil {
     render.JSON(err.HttpCode, err)
     return
   }
-  log.Println("User logged in:", profile.Name, "id:", profile.Id)
+  log.Println("User logged in:", profile.Name, "id:", profile.ID)
   jwtSignKey := []byte(conf.JWTSecret)
 
   // Create the Claims
@@ -35,7 +35,7 @@ func LoginWithProvider(extAuth models.ExtAuthCredentials, render render.Render, 
     AvatarURL: profile.AvatarURL,
     StandardClaims: jwt.StandardClaims{
       ExpiresAt: time.Now().Add(time.Hour * 24 * 365).Unix(),
-      Id:        profile.Id,
+      Id:        profile.ID,
       Issuer:    profile.Name,
     },
   }

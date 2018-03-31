@@ -63,7 +63,7 @@ select:-webkit-autofill:focus {
   font-size: 16px;
   transition: color 0.2s ease-in;
   cursor: pointer;
-  outline:none;
+  outline: none;
 }
 
 .flat-button:hover {
@@ -76,7 +76,6 @@ select:-webkit-autofill:focus {
 a, button, input, mat-checkbox, mat-icon {
   -webkit-app-region: no-drag;
 }
-
 
 //==============================================
 // MATERIAL DESIGN ICONS SIZING

@@ -11,25 +11,25 @@
   <div class="chat-log-container">
     <div class="chat-log">
       <div class="chat-messages" #chatLogElement>
-        <div *ngFor="let chatMessage of room.chatLog; let i = index"
+        <div *ngFor="let message of room.messages; let i = index"
              class="chat-message"
-             [class.mine]="chatMessage.from == room.me.id"
-             [class.head]="isHeadMessage(chatMessage, i)">
+             [class.mine]="message.from == room.me.id"
+             [class.head]="isHeadMessage(message, i)">
           <div class="chat-message-from">
-            <div class="chat-avatar-container" fxFlex="48px" *ngIf="isHeadMessage(chatMessage, i)">
-              <img src="{{ getAvatar(chatMessage.from) }}"
+            <div class="chat-avatar-container" fxFlex="48px" *ngIf="isHeadMessage(message, i)">
+              <img src="{{ getAvatar(message.from) }}"
                    class="chat-avatar"
-                   *ngIf="getAvatar(chatMessage.from); else defaultAvatar"/>
+                   *ngIf="getAvatar(message.from); else defaultAvatar"/>
               <ng-template #defaultAvatar>
                 <img src="../../../assets/img/default-avatar.png" class="chat-avatar"/>
               </ng-template>
             </div>
           </div>
           <div class="chat-message-text">
-            {{chatMessage.message}}
+            {{message.body}}
           </div>
-          <div class="chat-message-timestamp" *ngIf="isHeadMessage(chatMessage, i)">
-              {{ chatMessage.timestamp | date: 'hh:mm' }}
+          <div class="chat-message-timestamp" *ngIf="isHeadMessage(message, i)">
+              {{ message.timestamp | date: 'hh:mm' }}
           </div>
         </div>
       </div>

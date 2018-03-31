@@ -1,5 +1,6 @@
 export class User {
-  id?: string;
+  id: string;
   name: string;
   avatarUrl: string;
+  online? = false;
 }

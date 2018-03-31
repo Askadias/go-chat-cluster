@@ -28,13 +28,13 @@ func (manager *ClientManager) Start() {
     select {
     case conn := <-manager.Register:
       manager.Clients[conn] = true
-      jsonMessage, _ := json.Marshal(&models.Message{Body: "/connected"})
+      jsonMessage, _ := json.Marshal(&models.Message{Type: "open"})
       manager.send(jsonMessage, conn)
     case conn := <-manager.Unregister:
       if _, ok := manager.Clients[conn]; ok {
         close(conn.Send)
         delete(manager.Clients, conn)
-        jsonMessage, _ := json.Marshal(&models.Message{Body: "/disconnected"})
+        jsonMessage, _ := json.Marshal(&models.Message{Type: "close"})
         manager.send(jsonMessage, conn)
       }
     case message := <-manager.Broadcast:

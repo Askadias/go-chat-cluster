@@ -16,6 +16,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
 import {FriendsFilterPipe} from "./friends-filter.pipe";
+import {SkipOwnFilterPipe} from "./skip-own-filter.pipe";
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import {FriendsFilterPipe} from "./friends-filter.pipe";
     SidebarComponent,
     ChatComponent,
     RoomComponent,
-    FriendsFilterPipe
+    FriendsFilterPipe,
+    SkipOwnFilterPipe
   ],
   imports: [
     CommonModule,

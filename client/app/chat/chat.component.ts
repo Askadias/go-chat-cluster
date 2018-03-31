@@ -4,7 +4,8 @@ import {ActivatedRoute} from "@angular/router";
 import {ChatService} from "../services/chat.service";
 import {User} from "../domain/user";
 import {AuthService} from "../services/auth.service";
-import {ChatRoom} from "../domain/chat-room";
+import {Room} from "../domain/room";
+import {RoomContainer} from "../domain/room-container";
 
 @Component({
   selector: 'chat-component',
@@ -17,8 +18,8 @@ export class ChatComponent implements OnInit {
   errors: string[] = [];
   profile: User;
   friends: User[] = [];
-  chats: ChatRoom[] = [];
-  activeRoom: ChatRoom;
+  rooms: RoomContainer[] = [];
+  activeRoom: RoomContainer;
   loading = false;
   foldSocialBar = false;
   chatOpened = false;
@@ -29,11 +30,22 @@ export class ChatComponent implements OnInit {
     this.oauthConfig = env.oauth;
     this.loading = true;
     this.profile = auth.getProfile();
-    this.activeRoom = new ChatRoom(this.profile, null);
-    this.chat.getFriends().subscribe(
+    this.activeRoom = null;
+    this.auth.getFriends().subscribe(
       (friends) => {
         this.loading = false;
         this.friends = friends;
+        this.chat.getRooms().subscribe(
+          (rooms) => {
+            this.loading = false;
+            if (rooms) {
+              this.rooms = rooms.map((room) => new RoomContainer(this.profile, room, this.auth, this.chat));
+            }
+          }, (response) => {
+            this.loading = false;
+            this.errors = [response.message];
+          }
+        );
       }, (response) => {
         this.loading = false;
         this.errors = [response.message];
@@ -44,42 +56,85 @@ export class ChatComponent implements OnInit {
   ngOnInit() {
     this.chat.getEventListener().subscribe(event => {
       if (event.type === 'message') {
-        let data = event.data.content;
-        if (event.data.roomId) {
-          const targetChat = this.chats.find((chat) =>
-            chat.id === event.data.roomId
+        if (event.data.room) {
+          if (event.data.type === 'update') {
+            this.loading = false;
+            this.chat.getRoom(event.data.room).subscribe(
+              (room) => {
+                this.loading = false;
+                const roomContainer = new RoomContainer(this.profile, room, this.auth, this.chat);
+                const idx = this.rooms.findIndex(roomContainer =>
+                  roomContainer.room.id === event.data.room
+                );
+                if (idx > -1) {
+                  this.rooms[idx] = roomContainer;
+                  if (this.activeRoom && this.activeRoom.room.id == room.id) {
+                    this.activeRoom = roomContainer;
+                  }
+                } else {
+                  this.rooms.push(roomContainer);
+                }
+              }, (response) => {
+                this.loading = false;
+                if (response.status == 404) {
+                  this.dismissChat(this.rooms.find(rm => rm.room.id === event.data.room))
+                } else {
+                  this.errors = [response.message];
+                }
+              }
+            )
+          } else {
+            const targetChat = this.rooms.find((roomContainer) =>
+              roomContainer.room.id === event.data.room
+            );
+            if (targetChat) {
+              targetChat.onMessageReceive(event.data)
+            } else {
+              this.loading = false;
+              this.chat.getRoom(event.data.room).subscribe(
+                (room) => {
+                  this.loading = false;
+                  this.rooms.push(new RoomContainer(this.profile, room, this.auth, this.chat));
+                }, (response) => {
+                  this.loading = false;
+                  this.errors = [response.message];
+                }
+              )
+            }
+          }
+        }
+      }
+      if (event.type == "close") {
+        if (event.data.room) {
+          const targetChat = this.rooms.find((roomContainer) =>
+            roomContainer.room.id === event.data.room
           );
           if (targetChat) {
-            let senderId = event.data.sender;
+            let senderId = event.data.from;
             if (senderId) {
-              let sender = targetChat.participants.find((user) =>
-                user.id === senderId
-              );
+              let sender = targetChat.accounts.get(senderId);
               if (sender) {
-                targetChat.onMessageReceive(data, sender.id)
+                sender.online = false
               }
             }
           }
         }
       }
-      if(event.type == "close") {
-        if (event.data.roomId) {
-          const targetChat = this.chats.find((chat) =>
-            chat.id === event.data.roomId
+      if (event.type == "open") {
+        if (event.data.room) {
+          const targetChat = this.rooms.find((roomContainer) =>
+            roomContainer.room.id === event.data.room
           );
           if (targetChat) {
-            let senderId = event.data.sender;
+            let senderId = event.data.from;
             if (senderId) {
-              let sender = targetChat.participants.find((user) =>
-                user.id === senderId
-              );
-              this.removeFromChat(targetChat, sender)
+              let sender = targetChat.accounts.get(senderId);
+              if (sender) {
+                sender.online = true
+              }
             }
           }
         }
-      }
-      if(event.type == "open") {
-        // this.messages.push("/The socket connection has been established");
       }
     })
   }
@@ -88,59 +143,71 @@ export class ChatComponent implements OnInit {
     this.auth.logout()
   }
 
-  chatWith(friend: User) {
-    const existingChat = this.chats.find((chat) =>
-      chat.participants.length === 1
-      && chat.participants[0].id === friend.id
+  chatWith(userId: string) {
+    const existingRoom = this.rooms.find((roomContainer) =>
+      roomContainer.room.members.length === 2
+      && !!roomContainer.room.members.find((id) => id == userId)
     );
-    if (existingChat) {
-      if (this.activeRoom.id !== existingChat.id) {
-        this.switchToChat(existingChat)
+    if (existingRoom) {
+      if (this.activeRoom.room.id !== existingRoom.room.id) {
+        this.switchToChat(existingRoom)
       }
     } else {
-      let newChat = new ChatRoom(this.profile, friend);
-      this.chats.push(newChat);
-      this.switchToChat(newChat)
+      this.chat.newRoom(new Room(this.profile.id, userId)).subscribe(
+        (newRoom) => {
+          this.loading = false;
+          const roomContainer = new RoomContainer(this.profile, newRoom, this.auth, this.chat);
+          this.rooms.push(roomContainer);
+          this.switchToChat(roomContainer)
+        }, (response) => {
+          this.loading = false;
+          this.errors = [response.message];
+        }
+      );
     }
   }
 
   addToCurrentChat(friend: User) {
-    this.activeRoom.addParticipant(friend)
+    this.activeRoom.addMember(friend);
   }
 
-  removeFromChat(chat: ChatRoom, friend: User) {
-    if (chat.participants.length === 1) {
-      this.dismissChat(chat);
+  removeFromChat(roomContainer: RoomContainer, userId: string) {
+    if (roomContainer.room.members.length === 1) {
+      this.dismissChat(roomContainer);
     } else {
-      chat.excludeParticipant(friend);
+      roomContainer.kickMember(userId);
     }
   }
 
-  isActiveChat(chat: ChatRoom) {
-    return this.activeRoom && chat.id === this.activeRoom.id;
+  isActiveChat(chat: RoomContainer) {
+    return this.activeRoom && chat.room.id === this.activeRoom.room.id;
   }
 
-  switchToChat(chat: ChatRoom) {
+  switchToChat(chat: RoomContainer) {
     this.activeRoom = chat;
     this.chatOpened = true;
   }
 
-  canAddToCurrentChat(friend: Account) {
-    return this.activeRoom.participants.length > 0 && !this.activeRoom.accounts.has(friend.id);
+  canAddToCurrentChat(userId: string) {
+    return this.activeRoom != null
+      && this.activeRoom.room.members.length > 0
+      && this.activeRoom.room.members.indexOf(userId) == -1;
   }
 
   closeChat() {
     this.chatOpened = false;
-    this.activeRoom = new ChatRoom(this.profile, null);
+    this.activeRoom = null;
   }
 
-  dismissChat(chat: ChatRoom) {
-    this.chats.splice(
-      this.chats.findIndex((it) => it.id === chat.id),
-      1
-    );
-    if (this.activeRoom.id === chat.id) {
-      this.closeChat();
+  dismissChat(chat: RoomContainer) {
+    if (chat) {
+      this.rooms.splice(
+        this.rooms.findIndex((it) => it.room.id === chat.room.id),
+        1
+      );
+      if (this.activeRoom.room.id === chat.room.id) {
+        this.closeChat();
+      }
     }
   }
 

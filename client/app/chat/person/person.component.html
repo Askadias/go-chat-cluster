@@ -1,4 +1,5 @@
 <div class="person {{className}}"
+     *ngIf="person"
      [class.active]="active"
      [class.compact]="compact"
      fxLayout="row"
@@ -11,9 +12,9 @@
      fxLayoutAlign="start center">
     <div class="avatar-container" fxFlex="48px">
       <div class="mask"></div>
-      <img src="{{ avatar }}"
+      <img src="{{ person.avatarUrl }}"
            class="avatar"
-           *ngIf="avatar; else defaultAvatar"/>
+           *ngIf="person.avatarUrl; else defaultAvatar"/>
       <ng-template #defaultAvatar>
         <img src="../../../assets/img/avatars/default-avatar.png" class="avatar"/>
       </ng-template>
@@ -22,7 +23,7 @@
          class="person-name"
          [class.highlight]="showPersonControls"
           [@fadeShiftAnimation]>
-      {{ name }}
+      {{ person.name }}
     </div>
   </a>
   <div class="person-controls"

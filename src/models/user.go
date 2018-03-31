@@ -1,9 +1,9 @@
 package models
 
 type User struct {
-  Id        string `json:"id" bson:"id"`
+  ID        string `json:"id" bson:"id"`
   Name      string `json:"name" bson:"name"`
-  AvatarURL string `json:"avatarUrl,omitempty" bson:"-"`
+  AvatarURL string `json:"avatarUrl,omitempty" bson:"avatarUrl,omitempty"`
 }
 
 type UserList struct {
