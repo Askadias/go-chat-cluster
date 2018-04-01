@@ -16,21 +16,22 @@ import (
 )
 
 // Initializes a WebSocket connection for the current user
-func ConnectToChat(res http.ResponseWriter, req *http.Request, render render.Render, chatLog db.ChatLog) {
+func ConnectToChat(req *http.Request, res http.ResponseWriter, render render.Render, chatLog db.ChatLog, manager *services.ConnectionManager) {
   tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
-    profileID := claims["jti"]
+    profileID := claims["jti"].(string)
 
     if conn, err := (&websocket.Upgrader{}).Upgrade(res, req, nil); err != nil {
       http.NotFound(res, req)
     } else {
-      client := &services.Client{
-        Id:      profileID.(string),
+      client := &services.Connection{
+        UserID:  profileID,
         Socket:  conn,
         Send:    make(chan []byte),
         ChatLog: chatLog,
+        Manager: *manager,
       }
-      services.ChatManager.Register <- client
+      manager.Register <- client
 
       go client.Read()
       go client.Write()

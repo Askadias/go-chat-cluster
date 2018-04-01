@@ -8,39 +8,40 @@ import (
   "db"
 )
 
-type Client struct {
-  Id      string
+type Connection struct {
+  UserID  string
   Socket  *websocket.Conn
   Send    chan []byte
   ChatLog db.ChatLog
+  Manager ConnectionManager
 }
 
-func (c *Client) Read() {
+func (c *Connection) Read() {
   defer func() {
-    ChatManager.Unregister <- c
+    c.Manager.Unregister <- c
     c.Socket.Close()
   }()
 
   for {
     _, message, err := c.Socket.ReadMessage()
     if err != nil {
-      ChatManager.Unregister <- c
+      c.Manager.Unregister <- c
       c.Socket.Close()
       break
     }
     log.Println("Message received:", string(message))
     msg := models.Message{}
     json.Unmarshal(message, &msg)
-    msg.From = c.Id
-    jsonMessage, _ := json.Marshal(&msg)
-    ChatManager.Broadcast <- jsonMessage
+    msg.From = c.UserID
+
+    c.Manager.Broadcast <- msg
     if msg.Type != "update" {
       c.ChatLog.AddMessage(msg)
     }
   }
 }
 
-func (c *Client) Write() {
+func (c *Connection) Write() {
   defer func() {
     c.Socket.Close()
   }()

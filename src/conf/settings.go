@@ -14,6 +14,7 @@ var ServerPort int64
 var SessionSecret string
 var JWTSecret string
 var JWTUserPropName string
+var RedisURL string
 var MongoURL string
 var MongoDBName string
 var MongoTimeout time.Duration
@@ -36,6 +37,7 @@ func init() {
     JWTSecret = os.Getenv("JWT_SECRET")
     ServerPort, _ = strconv.ParseInt(os.Getenv("PORT"), 10, 0)
   default:
+    RedisURL = os.Getenv("REDIS_URL")
     MongoURL = os.Getenv("MONGO_URL")
     MongoDBName = os.Getenv("MONGO_DB_NAME")
     MongoTimeout = 1 * time.Second

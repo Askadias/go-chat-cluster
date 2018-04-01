@@ -43,6 +43,10 @@ var chatDBOptions = db.ChatDBOptions{
   MaxOpenedChats: conf.MaxOpenedChats,
 }
 
+var redisOptions = db.RedisOptions{
+  RedisURL: conf.RedisURL,
+}
+
 func main() {
   m := martini.New()
   // Add Logging
@@ -71,9 +75,6 @@ func main() {
 
   jwtMiddleware := auth.NewJwtMiddleware(jwtOptions)
 
-  // WebSocket Manager
-  go services.ChatManager.Start()
-
   // Injecting Services
   facebook := services.NewFacebook(fbOptions)
   chat := db.NewMongoChat(chatDBOptions)
@@ -82,6 +83,11 @@ func main() {
   m.MapTo(facebook, (*services.Friends)(nil))
   m.MapTo(chat, (*db.Chat)(nil))
   m.MapTo(chat, (*db.ChatLog)(nil))
+
+  // WebSocket Manager
+  bus := db.NewRedisBus(redisOptions)
+  connectionManager := services.NewConnectionManager(bus, chat)
+  m.Map(connectionManager)
 
   // API Routes
   m.Use(render.Renderer())

@@ -10,7 +10,7 @@ export class FriendsFilterPipe implements PipeTransform {
     if (!items || !filter) {
       return items;
     }
-    return items.filter(item => (item.name.indexOf(filter) !== -1));
+    return items.filter(item => (item.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1));
   }
 
 }
