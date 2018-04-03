@@ -76,6 +76,8 @@ func (manager *ConnectionManager) Broadcast(message *models.Message, auditory []
 }
 
 func (manager *ConnectionManager) send(message []byte, ignore *Connection) {
+  manager.mutex.RLock()
+  defer manager.mutex.RUnlock()
   for _, conn := range manager.Connections {
     if conn != ignore {
       conn.Send <- message
