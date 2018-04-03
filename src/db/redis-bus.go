@@ -16,28 +16,28 @@ type RedisBus struct {
 }
 
 func NewRedisBus(options RedisOptions) *RedisBus {
-  b := &RedisBus{
+  bus := &RedisBus{
     options: options,
     receive: make(chan map[string][]byte),
   }
-  go b.run()
-  return b
+  go bus.run()
+  return bus
 }
 
-func (b *RedisBus) run() {
-  redisConn, err := b.conn()
+func (bus *RedisBus) run() {
+  redisConn, err := bus.conn()
   if err != nil {
     panic(err)
   }
   defer redisConn.Close()
-  b.pubSubConn = &redis.PubSubConn{Conn: redisConn}
-  defer b.pubSubConn.Close()
+  bus.pubSubConn = &redis.PubSubConn{Conn: redisConn}
+  defer bus.pubSubConn.Close()
   for {
-    switch v := b.pubSubConn.Receive().(type) {
+    switch v := bus.pubSubConn.Receive().(type) {
     case redis.Message:
       msg := make(map[string][]byte)
       msg[v.Channel] = v.Data
-      b.receive <- msg
+      bus.receive <- msg
 
     case redis.Subscription:
       log.Printf("subscription message: %s: %s %d\n", v.Channel, v.Kind, v.Count)
@@ -49,19 +49,19 @@ func (b *RedisBus) run() {
   }
 }
 
-func (b *RedisBus) Receive() chan map[string][]byte {
-  return b.receive
+func (bus *RedisBus) Receive() chan map[string][]byte {
+  return bus.receive
 }
-func (b *RedisBus) Subscribe(id string) error {
-  return b.pubSubConn.Subscribe(id)
-}
-
-func (b *RedisBus) Unsubscribe(id string) error {
-  return b.pubSubConn.Unsubscribe(id)
+func (bus *RedisBus) Subscribe(id string) error {
+  return bus.pubSubConn.Subscribe(id)
 }
 
-func (b *RedisBus) Publish(id string, msg []byte) error {
-  if c, err := b.conn(); err != nil {
+func (bus *RedisBus) Unsubscribe(id string) error {
+  return bus.pubSubConn.Unsubscribe(id)
+}
+
+func (bus *RedisBus) Publish(id string, msg []byte) error {
+  if c, err := bus.conn(); err != nil {
     log.Printf("error on redis conn. %s\n", err)
     return err
   } else {
@@ -70,6 +70,6 @@ func (b *RedisBus) Publish(id string, msg []byte) error {
   }
 }
 
-func (b *RedisBus) conn() (redis.Conn, error) {
-  return redis.DialURL(b.options.RedisURL)
+func (bus *RedisBus) conn() (redis.Conn, error) {
+  return redis.DialURL(bus.options.RedisURL)
 }

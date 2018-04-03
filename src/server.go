@@ -102,7 +102,7 @@ func main() {
     r.Post("/rooms/:id/members/:memberID", jwtMiddleware.CheckJWT, controllers.AddRoomMember)
     r.Delete("/rooms/:id/members/:memberID", jwtMiddleware.CheckJWT, controllers.RemoveRoomMember)
     r.Get("/rooms/:id/log", jwtMiddleware.CheckJWT, controllers.GetChatLog)
-    r.Post("/rooms/:id/log", binding.Bind(models.Message{}), jwtMiddleware.CheckJWT, controllers.LogMessage)
+    r.Post("/rooms/:id/log", binding.Bind(models.Message{}), jwtMiddleware.CheckJWT, controllers.SendMessage)
     r.Post("/login/:provider", binding.Bind(models.ExtAuthCredentials{}), controllers.LoginWithProvider)
     r.Get("/ws", jwtMiddleware.CheckJWT, controllers.ConnectToChat)
   })

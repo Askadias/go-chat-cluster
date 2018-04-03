@@ -119,84 +119,87 @@ func (c *MongoChat) GetRoom(profileID string, roomID string) (*models.Room, *con
 }
 
 // Deletes Room from the MongoDB by its owner.
-func (c *MongoChat) DeleteRoom(profileID string, roomID string) *conf.ApiError {
+func (c *MongoChat) DeleteRoom(profileID string, roomID string) (*models.Room, *conf.ApiError) {
   s := c.mongoSession.Clone()
   defer s.Close()
   db := s.DB(c.options.MongoDBName)
 
   if !bson.IsObjectIdHex(roomID) {
-    return conf.ErrInvalidId
+    return nil, conf.ErrInvalidId
   }
 
   var room models.Room
   if err := db.C(c.options.RoomCollectionName).FindId(roomID).One(&room); err != nil {
-    return parseMongoDBError(err)
+    return nil, parseMongoDBError(err)
   }
   if room.Owner != profileID {
-    return conf.ErrNotAnOwner
+    return nil, conf.ErrNotAnOwner
   }
 
   log.Println("Deleting chat room", roomID, "by owner", profileID)
   if err := db.C(c.options.RoomCollectionName).RemoveId(roomID); err != nil {
-    return parseMongoDBError(err)
+    return nil, parseMongoDBError(err)
   }
-  return nil
+  return &room, nil
 }
 
 // Adds new member to a given chat room.
 // Actual member info retrieved from account service.
 // Additionally checks that current user is an owner of that room to update it.
-func (c *MongoChat) AddRoomMember(profileID string, roomID string, memberID string) *conf.ApiError {
+func (c *MongoChat) AddRoomMember(profileID string, roomID string, memberID string) (*models.Room, *conf.ApiError) {
   s := c.mongoSession.Clone()
   defer s.Close()
   db := s.DB(c.options.MongoDBName)
 
   if !bson.IsObjectIdHex(roomID) {
-    return conf.ErrInvalidId
+    return nil, conf.ErrInvalidId
   }
 
   var room models.Room
   if err := db.C(c.options.RoomCollectionName).FindId(roomID).One(&room); err != nil {
-    return parseMongoDBError(err)
+    return nil, parseMongoDBError(err)
   }
   if room.Owner != profileID {
-    return conf.ErrNotAnOwner
+    return nil, conf.ErrNotAnOwner
   }
 
   if len(room.Members) >= c.options.MaxChatMembers {
-    return conf.ErrTooManyMembers
+    return nil, conf.ErrTooManyMembers
   }
 
   log.Println("Add member", memberID, "to room", roomID, "by", profileID)
+  now := time.Now()
 
   if err := db.C(c.options.RoomCollectionName).Update(
     bson.M{"_id": roomID, "members": bson.M{"$ne": memberID}},
     bson.M{
       "$push": bson.M{"members": memberID},
-      "$set":  bson.M{"updated": time.Now()},
+      "$set":  bson.M{"updated": now},
     }); err != nil {
-    return parseMongoDBError(err)
+    return nil, parseMongoDBError(err)
   }
-  return nil
+  room.Members = append(room.Members, memberID)
+  room.Updated = models.Timestamp(now)
+  return &room, nil
 }
 
 // Updates current Room by removing a member with a specific id.
 // Additionally checks that current user is an owner of that room to update it.
-func (c *MongoChat) RemoveRoomMember(profileID string, roomID string, memberID string) *conf.ApiError {
+func (c *MongoChat) RemoveRoomMember(profileID string, roomID string, memberID string) (*models.Room, *conf.ApiError) {
   s := c.mongoSession.Clone()
   defer s.Close()
   db := s.DB(c.options.MongoDBName)
 
   if !bson.IsObjectIdHex(roomID) {
-    return conf.ErrInvalidId
+    return nil, conf.ErrInvalidId
   }
 
   var room models.Room
   if err := db.C(c.options.RoomCollectionName).FindId(roomID).One(&room); err != nil {
-    return parseMongoDBError(err)
+    return nil, parseMongoDBError(err)
   }
   if room.Owner != profileID {
-    return conf.ErrNotAnOwner
+    return nil, conf.ErrNotAnOwner
   }
 
   log.Println("Remove member", memberID, "from room", roomID, "by", profileID)
@@ -207,14 +210,21 @@ func (c *MongoChat) RemoveRoomMember(profileID string, roomID string, memberID s
       "$pull": bson.M{"members": memberID},
       "$set":  bson.M{"updated": time.Now()},
     }); err != nil {
-    return parseMongoDBError(err)
+    return nil, parseMongoDBError(err)
   }
   if len(room.Members) <= 2 {
     if err := db.C(c.options.RoomCollectionName).RemoveId(roomID); err != nil {
-      return parseMongoDBError(err)
+      return nil, parseMongoDBError(err)
     }
   }
-  return nil
+
+  for i, m := range room.Members {
+    if m == memberID {
+      room.Members = append(room.Members[:i], room.Members[i+1:]...)
+      break
+    }
+  }
+  return &room, nil
 }
 
 // Adds message to chat log to a given chat room by a given member.
@@ -269,6 +279,38 @@ func (c *MongoChat) GetMessages(profileID string, roomID string, from time.Time,
     return nil, parseMongoDBError(err)
   }
   return messages, nil
+}
+
+func (c *MongoChat) AddReaction(profileID string, roomID string, messageID string, reaction string) *conf.ApiError {
+  s := c.mongoSession.Clone()
+  defer s.Close()
+  db := s.DB(c.options.MongoDBName)
+
+  if count, err := db.C(c.options.RoomCollectionName).Find(bson.M{"_id": roomID, "members": profileID}).Count();
+    err != nil || count == 0 {
+    return conf.ErrNotAMember
+  }
+
+  if err := db.C(c.options.MessagesCollectionName).UpdateId(messageID,
+    bson.M{"$set": bson.M{"reaction." + profileID: reaction}}); err != nil {
+    return parseMongoDBError(err)
+  } else {
+    return nil
+  }
+}
+
+func (c *MongoChat) EditMessage(profileID string, messageID string, body string) *conf.ApiError {
+  s := c.mongoSession.Clone()
+  defer s.Close()
+  db := s.DB(c.options.MongoDBName)
+
+  if err := db.C(c.options.MessagesCollectionName).Update(
+    bson.M{"_id": messageID, "from": profileID},
+    bson.M{"$set": bson.M{"body": body}}); err != nil {
+    return parseMongoDBError(err)
+  } else {
+    return nil
+  }
 }
 
 func parseMongoDBError(err error) *conf.ApiError {

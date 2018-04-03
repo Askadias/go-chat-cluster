@@ -1,10 +1,8 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
-import {AuthService} from "./auth.service";
 import {Message} from "../domain/message";
 import {Room} from "../domain/room";
-import {User} from "../domain/user";
 
 @Injectable()
 export class ChatService {
@@ -30,6 +28,10 @@ export class ChatService {
     return this.http.get<Message[]>(`/api/rooms/${roomId}/log?from${from}&limit=${limit}`);
   }
 
+  send(message: Message) {
+    return this.http.post<any>(`/api/rooms/${message.room}/log`, message);
+  }
+
   newRoom(room: Room): Observable<Room> {
     return this.http.post<Room>(`/api/rooms`, room);
   }
@@ -52,10 +54,6 @@ export class ChatService {
 
   deleteRoom(roomId: string): Observable<any> {
     return this.http.delete(`/api/rooms/${roomId}`);
-  }
-
-  send(message: Message) {
-    this.socket.send(JSON.stringify(message));
   }
 
   close() {

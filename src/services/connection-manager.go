@@ -6,11 +6,11 @@ import (
   "log"
   "sync"
   "db"
+  "conf"
 )
 
 type ConnectionManager struct {
   Connections map[string]*Connection
-  Broadcast   chan models.Message
   Register    chan *Connection
   Unregister  chan *Connection
   // --------------------------------------------
@@ -21,7 +21,6 @@ type ConnectionManager struct {
 
 func NewConnectionManager(bus db.Bus, chat db.Chat) *ConnectionManager {
   manager := &ConnectionManager{
-    Broadcast:   make(chan models.Message),
     Register:    make(chan *Connection),
     Unregister:  make(chan *Connection),
     Connections: make(map[string]*Connection),
@@ -55,23 +54,25 @@ func (manager *ConnectionManager) run() {
         manager.send(jsonMessage, conn)
       }
       if err := manager.bus.Unsubscribe(conn.UserID); err != nil {
-        log.Fatalln("Unable to disconnect user:", conn.UserID)
+        log.Println("Unable to disconnect user:", conn.UserID)
       }
     case message := <-manager.bus.Receive():
       for userID, msg := range message {
         manager.Connections[userID].Send <- msg
       }
-    case message := <-manager.Broadcast:
-      jsonMessage, _ := json.Marshal(&message)
-      if room, err := manager.chat.GetRoom(message.From, message.Room); err != nil {
-        log.Fatalln("Unable to publish message to room members", message.Room)
-      } else {
-        for _, memberId := range room.Members {
-          manager.bus.Publish(memberId, jsonMessage)
-        }
-      }
     }
   }
+}
+
+func (manager *ConnectionManager) Broadcast(message *models.Message, auditory []string) *conf.ApiError {
+  jsonMessage, _ := json.Marshal(message)
+  for _, memberId := range auditory {
+    if err := manager.bus.Publish(memberId, jsonMessage); err != nil {
+      log.Println("Failed to publish message of type", message.Type, "to user", memberId)
+      return conf.ErrBroadcastFailure
+    }
+  }
+  return nil
 }
 
 func (manager *ConnectionManager) send(message []byte, ignore *Connection) {

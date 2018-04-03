@@ -2,9 +2,6 @@ package services
 
 import (
   "github.com/gorilla/websocket"
-  "encoding/json"
-  "models"
-  "log"
   "db"
 )
 
@@ -16,6 +13,18 @@ type Connection struct {
   Manager ConnectionManager
 }
 
+func NewConnection(userID string, socket *websocket.Conn, chatLog db.ChatLog, manager ConnectionManager) *Connection {
+  connection := &Connection{
+    UserID:  userID,
+    Socket:  socket,
+    Send:    make(chan []byte),
+    ChatLog: chatLog,
+    Manager: manager,
+  }
+  manager.Register <- connection
+  return connection
+}
+
 func (c *Connection) Read() {
   defer func() {
     c.Manager.Unregister <- c
@@ -23,20 +32,11 @@ func (c *Connection) Read() {
   }()
 
   for {
-    _, message, err := c.Socket.ReadMessage()
+    _, _, err := c.Socket.ReadMessage()
     if err != nil {
       c.Manager.Unregister <- c
       c.Socket.Close()
       break
-    }
-    log.Println("Message received:", string(message))
-    msg := models.Message{}
-    json.Unmarshal(message, &msg)
-    msg.From = c.UserID
-
-    c.Manager.Broadcast <- msg
-    if msg.Type != "update" {
-      c.ChatLog.AddMessage(msg)
     }
   }
 }

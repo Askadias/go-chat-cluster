@@ -2,7 +2,6 @@ import {AfterViewChecked, Component, ElementRef, EventEmitter, Input, OnInit, Ou
 import {FormControl} from '@angular/forms';
 import {Message} from '../../domain/message';
 import {User} from '../../domain/user';
-import {Room} from '../../domain/room';
 import {RoomContainer} from "../../domain/room-container";
 
 @Component({
@@ -20,6 +19,8 @@ export class RoomComponent implements OnInit, AfterViewChecked {
   members: User[];
   messages: Message[];
   me: User;
+  loading = false;
+  errors: string[] = [];
 
   @ViewChild('chatLogElement') private chatLogContainer: ElementRef;
 
@@ -36,7 +37,16 @@ export class RoomComponent implements OnInit, AfterViewChecked {
 
   sendMessage() {
     if (this.messageInput.valid && this.room.newMessage !== '') {
-      this.room.chat.send(new Message(this.room.room.id, this.room.me.id, this.room.newMessage, Date.now()));
+      this.loading = true;
+      this.errors = [];
+      this.room.chat.send(new Message(this.room.room.id, this.room.me.id, this.room.newMessage, Date.now()))
+        .subscribe(() => {
+            this.loading = false;
+          },
+          (error) => {
+            this.loading = false;
+            this.errors = [error.message];
+          });
       this.room.newMessage = '';
       this.scrollToBottom();
     }
