@@ -45,6 +45,7 @@ func (manager *ConnectionManager) run() {
         manager.send(jsonMessage, conn)
       }
     case conn := <-manager.Unregister:
+      manager.mutex.Lock()
       if _, ok := manager.Connections[conn.UserID]; ok {
         close(conn.Send)
         manager.mutex.Lock()
@@ -53,13 +54,16 @@ func (manager *ConnectionManager) run() {
         jsonMessage, _ := json.Marshal(&models.Message{Type: "close"})
         manager.send(jsonMessage, conn)
       }
+      manager.mutex.Unlock()
       if err := manager.bus.Unsubscribe(conn.UserID); err != nil {
         log.Println("Unable to disconnect user:", conn.UserID)
       }
     case message := <-manager.bus.Receive():
+      manager.mutex.RLock()
       for userID, msg := range message {
         manager.Connections[userID].Send <- msg
       }
+      manager.mutex.RUnlock()
     }
   }
 }
