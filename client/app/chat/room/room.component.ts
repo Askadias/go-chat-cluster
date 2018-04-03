@@ -12,9 +12,9 @@ import {RoomContainer} from "../../domain/room-container";
 export class RoomComponent implements OnInit, AfterViewChecked {
 
   @Input() className = '';
-  @Input() room: RoomContainer;
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
   @Output() dismiss: EventEmitter<any> = new EventEmitter<any>();
+  _room: RoomContainer;
   messageInput = new FormControl('', []);
   members: User[];
   messages: Message[];
@@ -27,8 +27,16 @@ export class RoomComponent implements OnInit, AfterViewChecked {
   constructor() {
   }
 
+  @Input()
+  set room(room: RoomContainer) {
+    this._room = room;
+    setTimeout(() => {
+      const native = this.chatLogContainer.nativeElement;
+      native.scrollTop = native.scrollHeight;
+    });
+  }
+
   ngOnInit() {
-    this.scrollToBottom();
   }
 
   ngAfterViewChecked() {
@@ -36,10 +44,10 @@ export class RoomComponent implements OnInit, AfterViewChecked {
   }
 
   sendMessage() {
-    if (this.messageInput.valid && this.room.newMessage !== '') {
+    if (this.messageInput.valid && this._room.newMessage !== '') {
       this.loading = true;
       this.errors = [];
-      this.room.chat.send(new Message(this.room.room.id, this.room.me.id, this.room.newMessage, Date.now()))
+      this._room.chat.send(new Message(this._room.room.id, this._room.me.id, this._room.newMessage, Date.now()))
         .subscribe(() => {
             this.loading = false;
           },
@@ -47,19 +55,19 @@ export class RoomComponent implements OnInit, AfterViewChecked {
             this.loading = false;
             this.errors = [error.message];
           });
-      this.room.newMessage = '';
+      this._room.newMessage = '';
       this.scrollToBottom();
     }
   }
 
   getAvatar(userId: string): string {
-    const account = this.room.getUser(userId);
+    const account = this._room.getUser(userId);
     return account ? account.avatarUrl : null;
   }
 
   isHeadMessage(chatMessage: Message, index: number) {
-    return (this.room.messages.length === index + 1) // last message
-      || this.room.messages[index + 1].from !== this.room.messages[index].from;
+    return (this._room.messages.length === index + 1) // last message
+      || this._room.messages[index + 1].from !== this._room.messages[index].from;
   }
 
   scroll(): void {

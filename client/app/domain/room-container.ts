@@ -30,7 +30,7 @@ export class RoomContainer {
         this.errors = [error.message];
       }
     );
-    chat.getChatLog(this.room.id, Date.now(), 1000).subscribe((messages: Message[]) => {
+    chat.getChatLog(this.room.id, Date.now(), 100).subscribe((messages: Message[]) => {
         this.loading = false;
         if (messages) {
           this.messages = messages

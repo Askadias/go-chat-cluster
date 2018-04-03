@@ -41,14 +41,14 @@ export class ChatComponent implements OnInit {
             if (rooms) {
               this.rooms = rooms.map((room) => new RoomContainer(this.profile, room, this.auth, this.chat));
             }
-          }, (response) => {
+          }, (error) => {
             this.loading = false;
-            this.errors = [response.message];
+            this.errors = [error.message];
           }
         );
-      }, (response) => {
+      }, (error) => {
         this.loading = false;
-        this.errors = [response.message];
+        this.errors = [error.message];
       }
     );
   }
@@ -74,12 +74,12 @@ export class ChatComponent implements OnInit {
                 } else {
                   this.rooms.push(roomContainer);
                 }
-              }, (response) => {
+              }, (error) => {
                 this.loading = false;
-                if (response.status == 404) {
-                  this.dismissChat(this.rooms.find(rm => rm.room.id === event.data.room))
+                if (error.status == 404) {
+                  this.removeRoomFromPool(event.data.room)
                 } else {
-                  this.errors = [response.message];
+                  this.errors = [error.message];
                 }
               }
             )
@@ -95,9 +95,9 @@ export class ChatComponent implements OnInit {
                 (room) => {
                   this.loading = false;
                   this.rooms.push(new RoomContainer(this.profile, room, this.auth, this.chat));
-                }, (response) => {
+                }, (error) => {
                   this.loading = false;
-                  this.errors = [response.message];
+                  this.errors = [error.message];
                 }
               )
             }
@@ -159,9 +159,9 @@ export class ChatComponent implements OnInit {
           const roomContainer = new RoomContainer(this.profile, newRoom, this.auth, this.chat);
           this.rooms.push(roomContainer);
           this.switchToChat(roomContainer)
-        }, (response) => {
+        }, (error) => {
           this.loading = false;
-          this.errors = [response.message];
+          this.errors = [error.message];
         }
       );
     }
@@ -173,7 +173,7 @@ export class ChatComponent implements OnInit {
 
   removeFromChat(roomContainer: RoomContainer, userId: string) {
     if (roomContainer.room.members.length === 1) {
-      this.dismissChat(roomContainer);
+      this.removeRoomFromPool(roomContainer.room.id);
     } else {
       roomContainer.kickMember(userId);
     }
@@ -199,16 +199,26 @@ export class ChatComponent implements OnInit {
     this.activeRoom = null;
   }
 
-  dismissChat(chat: RoomContainer) {
-    if (chat) {
+  dismissChat(roomContainer: RoomContainer) {
+    this.loading = true;
+    this.chat.deleteRoom(roomContainer.room.id).subscribe(() => {
+        this.loading = false;
+        this.removeRoomFromPool(roomContainer.room.id);
+      }, (error) => {
+        this.loading = false;
+        this.errors = [error.message];
+      }
+    )
+  }
+
+  removeRoomFromPool(roomId) {
       this.rooms.splice(
-        this.rooms.findIndex((it) => it.room.id === chat.room.id),
+        this.rooms.findIndex((it) => it.room.id === roomId),
         1
       );
-      if (this.activeRoom.room.id === chat.room.id) {
+      if (this.activeRoom.room.id === roomId) {
         this.closeChat();
       }
-    }
   }
 
   trackByUserId(index: number, friend: User): string {
