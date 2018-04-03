@@ -1,8 +1,7 @@
 <div class="chat-theme chat">
-  <chat-sidebar [fold]="foldSocialBar" (mouseenter)="foldSocialBar = false">
+  <chat-sidebar>
     <div>
-      <chat-person [showPersonControls]="foldSocialBar"
-                   [person]="profile" [compact]="foldSocialBar">
+      <chat-person [person]="profile">
         <button class="flat-button person-control-btn" (click)="logout()">
           <mat-icon class="md-36">exit_to_app</mat-icon>
         </button>
@@ -13,8 +12,7 @@
         <a (click)="switchToChat(chat)" *ngIf="!isActiveChat(chat)" class="chat-group-overlay-btn"></a>
         <chat-person *ngFor="let memberId of chat.room.members | skipOwnFilter:profile.id"
                      (click)="!isActiveChat(chat) ? switchToChat(chat) : chatWith(memberId)"
-                     [person]="chat.getUser(memberId)"
-                     [compact]="foldSocialBar">
+                     [person]="chat.getUser(memberId)">
           <button class="flat-button person-control-grp-btn"
                   (click)="$event.stopPropagation(); removeFromChat(chat, memberId)"
                   *ngIf="chat.amIOwner()">
@@ -23,14 +21,13 @@
         </chat-person>
       </div>
     </div>
-    <mat-form-field (disabled)="foldSocialBar" [class.fold]="foldSocialBar"
-                    class="friends-filter-input" floatLabel="never">
+    <mat-form-field class="friends-filter-input" floatLabel="never">
       <input matInput #nameFilter placeholder="Friends">
     </mat-form-field>
     <div class="friends">
       <chat-person *ngFor="let friend of friends | friendsFilter:nameFilter.value; trackBy: trackByUserId"
                    (click)="chatWith(friend.id)"
-                   [person]="friend" [compact]="foldSocialBar">
+                   [person]="friend">
         <button class="flat-button person-control-btn" *ngIf="canAddToCurrentChat(friend.id)"
                 (click)="$event.stopPropagation(); addToCurrentChat(friend)">
           <mat-icon class="md-36">add</mat-icon>
@@ -38,12 +35,11 @@
       </chat-person>
     </div>
   </chat-sidebar>
-  <div class="chat-content" [class.social-bar-fold]="foldSocialBar" (mouseenter)="foldSocialBar = true">
+  <div class="chat-content">
     <div class="chat-bg"></div>
     <chat-room *ngIf="chatOpened"
                [room]="activeRoom"
                (close)="closeChat()"
-               (dismiss)="dismissChat(activeRoom)"
-               (mouseenter)="foldSocialBar=true"></chat-room>
+               (dismiss)="dismissChat(activeRoom)"></chat-room>
   </div>
 </div>
