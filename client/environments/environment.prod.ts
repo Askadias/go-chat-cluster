@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
   oauth: {
-    oAuthRedirectUriBase: 'https://go-chat-cluster.heroku.com/login',
-    redirectUri: 'https://go-chat-cluster.heroku.com/authorized',
+    oAuthRedirectUriBase: 'https://hisc.herokuapp.com/login',
+    redirectUri: 'https://hisc.herokuapp.com/authorized',
     facebook: {
       clientId: '1132078350149238',
       authUri: 'https://www.facebook.com/dialog/oauth',
