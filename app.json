@@ -1,12 +1,15 @@
 {
-  "name": "Start on Heroku: Go",
-  "description": "Go Getting Started Example App",
+  "name": "hisc",
+  "description": "Highly Scalable Chat",
   "keywords": [
-    "getting-started",
+    "go-chat-cluster",
     "go",
-    "sample",
-    "example"
+    "hisc",
+    "scalable",
+    "chat",
+    "facebook",
+    "oauth"
   ],
-  "website": "http://github.com/heroku/go-getting-started",
-  "repository": "http://github.com/heroku/go-getting-started"
+  "website": "http://github.com/Askadias/go-chat-cluster",
+  "repository": "http://github.com/Askadias/go-chat-cluster"
 }
