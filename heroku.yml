@@ -3,6 +3,10 @@
 build:
   languages:
     - go
+  config:
+    MARTINI_ENV: production
+  pre:
+    - npm run pkg
 
 run:
-  web: hisc
+  web: go-chat-cluster
