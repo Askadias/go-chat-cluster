@@ -44,7 +44,7 @@ func init() {
     MaxChatMembers = 100
     MaxOpenedChats = 10
     FBClientID = "180253089366075"
-    FBClientSecret = "e89384a22b77d638b8b2ba4ec1d458e1"
+    FBClientSecret = os.Getenv("FB_SECRET")
     FBRedirectURL = "http://localhost:3000/authorized"
     FBTimeoutMS = 500
     FBBaseURL = "https://graph.facebook.com/v2.12"
