@@ -1,21 +1,21 @@
-package main
+package go_chat_cluster
 
 import (
   "github.com/go-martini/martini"
-  "github.com/Askadias/go-chat-cluster/src/conf"
+  "github.com/Askadias/go-chat-cluster/conf"
   "net/http"
   "github.com/codegangsta/martini-contrib/render"
   "github.com/martini-contrib/gzip"
   "github.com/martini-contrib/sessions"
   "strconv"
   "github.com/dgrijalva/jwt-go"
-  "github.com/Askadias/go-chat-cluster/src/controllers"
+  "github.com/Askadias/go-chat-cluster/controllers"
   "github.com/codegangsta/martini-contrib/binding"
-  "github.com/Askadias/go-chat-cluster/src/models"
-  "github.com/Askadias/go-chat-cluster/src/services"
-  "github.com/Askadias/go-chat-cluster/src/middleware"
-  "github.com/Askadias/go-chat-cluster/src/middleware/auth"
-  "github.com/Askadias/go-chat-cluster/src/db"
+  "github.com/Askadias/go-chat-cluster/models"
+  "github.com/Askadias/go-chat-cluster/services"
+  "github.com/Askadias/go-chat-cluster/middleware"
+  "github.com/Askadias/go-chat-cluster/middleware/auth"
+  "github.com/Askadias/go-chat-cluster/db"
 )
 
 var jwtOptions = auth.Options{
