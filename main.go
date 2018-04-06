@@ -108,5 +108,5 @@ func main() {
   })
   m.MapTo(router, (*martini.Routes)(nil))
   m.Action(router.Handle)
-  m.RunOnAddr("localhost:" + strconv.Itoa(int(conf.ServerPort)))
+  m.RunOnAddr(":" + strconv.Itoa(int(conf.ServerPort)))
 }
