@@ -26,7 +26,6 @@ func ConnectToChat(
   req *http.Request,
   res http.ResponseWriter,
   render render.Render,
-  chatLog db.ChatLog,
   manager *services.ConnectionManager,
 ) {
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
@@ -42,7 +41,7 @@ func ConnectToChat(
         conn.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
         return nil
       })
-      connection := services.NewConnection(profileID, conn, chatLog)
+      connection := services.NewConnection(profileID, conn)
       manager.Register <- connection
     }
   } else {

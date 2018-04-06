@@ -2,22 +2,19 @@ package services
 
 import (
   "github.com/gorilla/websocket"
-  "github.com/Askadias/go-chat-cluster/db"
   "time"
   "github.com/Askadias/go-chat-cluster/conf"
 )
 
 type Connection struct {
-  UserID  string
-  Socket  *websocket.Conn
-  ChatLog db.ChatLog
+  UserID string
+  Socket *websocket.Conn
 }
 
-func NewConnection(userID string, socket *websocket.Conn, chatLog db.ChatLog) *Connection {
+func NewConnection(userID string, socket *websocket.Conn) *Connection {
   connection := &Connection{
-    UserID:  userID,
-    Socket:  socket,
-    ChatLog: chatLog,
+    UserID: userID,
+    Socket: socket,
   }
   return connection
 }
