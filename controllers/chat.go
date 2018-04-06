@@ -15,6 +15,12 @@ import (
   "github.com/Askadias/go-chat-cluster/db"
 )
 
+var upgrader = websocket.Upgrader{
+  HandshakeTimeout: conf.Socket.HandshakeTimeout,
+  ReadBufferSize:   conf.Socket.ReadBufferSize,
+  WriteBufferSize:  conf.Socket.WriteBufferSize,
+}
+
 // Initializes a WebSocket connection for the current user
 func ConnectToChat(
   req *http.Request,
@@ -23,16 +29,21 @@ func ConnectToChat(
   chatLog db.ChatLog,
   manager *services.ConnectionManager,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
 
-    if conn, err := (&websocket.Upgrader{}).Upgrade(res, req, nil); err != nil {
+    if conn, err := upgrader.Upgrade(res, req, nil); err != nil {
       http.NotFound(res, req)
     } else {
-      connection := services.NewConnection(profileID, conn, chatLog, *manager)
-      go connection.Read()
-      go connection.Write()
+      conn.SetReadLimit(conf.Socket.MaxMessageSize)
+      conn.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
+      conn.SetPongHandler(func(string) error {
+        conn.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
+        return nil
+      })
+      connection := services.NewConnection(profileID, conn, chatLog)
+      manager.Register <- connection
     }
   } else {
     render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
@@ -47,7 +58,7 @@ func CreateRoom(
   chat db.Chat,
   friends services.Friends,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
 
@@ -78,7 +89,7 @@ func GetRooms(
   render render.Render,
   chat db.Chat,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
     if rooms, err := chat.GetRooms(profileID); err != nil {
@@ -98,7 +109,7 @@ func GetRoom(
   render render.Render,
   chat db.Chat,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
     roomID := params["id"]
@@ -121,7 +132,7 @@ func DeleteRoom(
   chat db.Chat,
   manager *services.ConnectionManager,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
     roomID := params["id"]
@@ -150,7 +161,7 @@ func AddRoomMember(
   friends services.Friends,
   manager *services.ConnectionManager,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
     roomID := params["id"]
@@ -188,7 +199,7 @@ func RemoveRoomMember(
   chat db.Chat,
   manager *services.ConnectionManager,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
     roomID := params["id"]
@@ -218,7 +229,7 @@ func SendMessage(
   chatLog db.ChatLog,
   manager *services.ConnectionManager,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
     roomID := params["id"]
@@ -250,7 +261,7 @@ func GetChatLog(
   render render.Render,
   chatLog db.ChatLog,
 ) {
-  tkn := req.Context().Value(conf.JWTUserPropName).(*jwt.Token)
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
     roomID := params["id"]
@@ -266,7 +277,7 @@ func GetChatLog(
     }
     limit, err := strconv.Atoi(limitParam)
     if err != nil {
-      limit = conf.ChatLogLimit // If from is not a valid integer, ignore it
+      limit = conf.Chat.DefaultMessagesLimit // If from is not a valid integer, ignore it
     }
 
     if messages, err := chatLog.GetMessages(profileID, roomID, from, limit); err != nil {

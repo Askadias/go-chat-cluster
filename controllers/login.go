@@ -28,7 +28,7 @@ func LoginWithProvider(extAuth models.ExtAuthCredentials, render render.Render, 
     return
   }
   log.Println("User logged in:", profile.Name, "id:", profile.ID)
-  jwtSignKey := []byte(conf.JWTSecret)
+  jwtSignKey := []byte(conf.System.JWTSecret)
 
   // Create the Claims
   claims := UserClaims{

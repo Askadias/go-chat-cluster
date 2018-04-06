@@ -20,31 +20,15 @@ import (
 
 var jwtOptions = auth.Options{
   ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-    return []byte(conf.JWTSecret), nil
+    return []byte(conf.System.JWTSecret), nil
   },
   SigningMethod: jwt.SigningMethodHS256,
   Extractor:     auth.FromJWTCookie,
-  UserProperty:  conf.JWTUserPropName,
-}
-
-var fbOptions = services.FBOptions{
-  ClientId:     conf.FBClientID,
-  ClientSecret: conf.FBClientSecret,
-  RedirectURL:  conf.FBRedirectURL,
-  BaseURL:      conf.FBBaseURL,
-  TimeoutMS:    conf.FBTimeoutMS,
-}
-
-var chatDBOptions = db.ChatDBOptions{
-  MongoURL:       conf.MongoURL,
-  MongoDBName:    conf.MongoDBName,
-  MongoTimeout:   conf.MongoTimeout,
-  MaxChatMembers: conf.MaxChatMembers,
-  MaxOpenedChats: conf.MaxOpenedChats,
+  UserProperty:  conf.System.JWTUserPropName,
 }
 
 var redisOptions = db.RedisOptions{
-  RedisURL: conf.RedisURL,
+  RedisPool: db.NewRedisPool(conf.Redis),
 }
 
 func main() {
@@ -56,7 +40,7 @@ func main() {
   m.Use(martini.Recovery())
 
   // Add Sessions Support
-  store := sessions.NewCookieStore([]byte(conf.SessionSecret))
+  store := sessions.NewCookieStore([]byte(conf.System.SessionSecret))
   store.Options(sessions.Options{
     Secure:   true,
     HttpOnly: true,
@@ -76,8 +60,8 @@ func main() {
   jwtMiddleware := auth.NewJwtMiddleware(jwtOptions)
 
   // Injecting Services
-  facebook := services.NewFacebook(fbOptions)
-  chat := db.NewMongoChat(chatDBOptions)
+  facebook := services.NewFacebook(conf.Facebook)
+  chat := db.NewMongoChat(conf.Mongo, conf.Chat)
   m.MapTo(facebook, (*services.OAuth)(nil))
   m.MapTo(facebook, (*services.Account)(nil))
   m.MapTo(facebook, (*services.Friends)(nil))
@@ -86,7 +70,7 @@ func main() {
 
   // WebSocket Manager
   bus := db.NewRedisBus(redisOptions)
-  connectionManager := services.NewConnectionManager(bus, chat)
+  connectionManager := services.NewConnectionManager(bus, chat, conf.Socket)
   m.Map(connectionManager)
 
   // API Routes
@@ -108,5 +92,5 @@ func main() {
   })
   m.MapTo(router, (*martini.Routes)(nil))
   m.Action(router.Handle)
-  m.RunOnAddr(":" + strconv.Itoa(int(conf.ServerPort)))
+  m.RunOnAddr(conf.System.Host + ":" + strconv.Itoa(conf.System.Port))
 }

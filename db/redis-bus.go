@@ -6,7 +6,7 @@ import (
 )
 
 type RedisOptions struct {
-  RedisURL string
+  RedisPool *redis.Pool
 }
 
 type RedisBus struct {
@@ -25,26 +25,26 @@ func NewRedisBus(options RedisOptions) *RedisBus {
 }
 
 func (bus *RedisBus) run() {
-  redisConn, err := bus.conn()
-  if err != nil {
-    panic(err)
-  }
-  defer redisConn.Close()
-  bus.pubSubConn = &redis.PubSubConn{Conn: redisConn}
-  defer bus.pubSubConn.Close()
-  for {
-    switch v := bus.pubSubConn.Receive().(type) {
-    case redis.Message:
-      msg := make(map[string][]byte)
-      msg[v.Channel] = v.Data
-      bus.receive <- msg
+  if conn := bus.options.RedisPool.Get(); conn.Err() != nil {
+    panic(conn.Err())
+  } else {
+    defer conn.Close()
+    bus.pubSubConn = &redis.PubSubConn{Conn: conn}
+    defer bus.pubSubConn.Close()
+    for {
+      switch v := bus.pubSubConn.Receive().(type) {
+      case redis.Message:
+        msg := make(map[string][]byte)
+        msg[v.Channel] = v.Data
+        bus.receive <- msg
 
-    case redis.Subscription:
-      log.Printf("subscription message: %s: %s %d\n", v.Channel, v.Kind, v.Count)
+      case redis.Subscription:
+        log.Printf("subscription message: %s: %s %d\n", v.Channel, v.Kind, v.Count)
 
-    case error:
-      log.Println("error pub/sub, delivery has stopped")
-      return
+      case error:
+        log.Println("error pub/sub, delivery has stopped")
+        return
+      }
     }
   }
 }
@@ -52,6 +52,7 @@ func (bus *RedisBus) run() {
 func (bus *RedisBus) Receive() chan map[string][]byte {
   return bus.receive
 }
+
 func (bus *RedisBus) Subscribe(id string) error {
   return bus.pubSubConn.Subscribe(id)
 }
@@ -61,15 +62,12 @@ func (bus *RedisBus) Unsubscribe(id string) error {
 }
 
 func (bus *RedisBus) Publish(id string, msg []byte) error {
-  if c, err := bus.conn(); err != nil {
-    log.Printf("error on redis conn. %s\n", err)
-    return err
+  if conn := bus.options.RedisPool.Get(); conn.Err() != nil {
+    log.Printf("error on getting redis connection from pool. %s\n", conn.Err())
+    return conn.Err()
   } else {
-    c.Do("PUBLISH", id, msg)
+    defer conn.Close()
+    conn.Do("PUBLISH", id, msg)
     return nil
   }
-}
-
-func (bus *RedisBus) conn() (redis.Conn, error) {
-  return redis.DialURL(bus.options.RedisURL)
 }

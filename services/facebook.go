@@ -15,14 +15,6 @@ type FBError struct {
   Error conf.ApiError `json:"error"`
 }
 
-type FBOptions struct {
-  ClientId     string
-  ClientSecret string
-  RedirectURL  string
-  BaseURL      string
-  TimeoutMS    time.Duration
-}
-
 // Facebook Service performs necessary operations related to the Facebook.com social network such as:
 //    - retrieving client token by service credentials
 //    - exchanging authorization code to access token
@@ -30,12 +22,12 @@ type FBOptions struct {
 //    - retrieving user friends list
 //    - retrieving user by id
 type Facebook struct {
-  options           FBOptions
+  options           conf.FacebookConf
   facebookClient    *http.Client
   clientAccessToken string
 }
 
-func NewFacebook(options FBOptions) (f *Facebook) {
+func NewFacebook(options conf.FacebookConf) (f *Facebook) {
   f = &Facebook{
     options: options,
     facebookClient: &http.Client{
@@ -51,7 +43,7 @@ func NewFacebook(options FBOptions) (f *Facebook) {
 // Retrieves client access token using service credentials.
 func (f *Facebook) setupClientToken() error {
   resp, err := f.facebookClient.Get(f.options.BaseURL + "/oauth/access_token?grant_type=client_credentials" +
-    "&client_id=" + f.options.ClientId +
+    "&client_id=" + f.options.ClientID +
     "&client_secret=" + f.options.ClientSecret)
   if err != nil {
     log.Fatal(err)
@@ -73,8 +65,8 @@ func (f *Facebook) setupClientToken() error {
 
 // Exchanges user authorization code to its access token.
 func (f *Facebook) ExchangeCodeToToken(accessCode string) (string, *conf.ApiError) {
-  resp, err := f.facebookClient.Get(conf.FBBaseURL + "/oauth/access_token" +
-    "?client_id=" + f.options.ClientId +
+  resp, err := f.facebookClient.Get(f.options.BaseURL + "/oauth/access_token" +
+    "?client_id=" + f.options.ClientID +
     "&redirect_uri=" + f.options.RedirectURL +
     "&client_secret=" + f.options.ClientSecret +
     "&code=" + accessCode)
@@ -99,7 +91,7 @@ func (f *Facebook) ExchangeCodeToToken(accessCode string) (string, *conf.ApiErro
 
 // Retrieves user profile using access token.
 func (f *Facebook) GetProfile(accessToken string) (*models.User, *conf.ApiError) {
-  req, _ := http.NewRequest("GET", conf.FBBaseURL+"/me", nil)
+  req, _ := http.NewRequest("GET", f.options.BaseURL+"/me", nil)
   req.Header.Set("Authorization", "Bearer "+accessToken)
   resp, err := f.facebookClient.Do(req)
   if err != nil {
