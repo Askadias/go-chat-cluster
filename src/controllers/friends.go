@@ -3,11 +3,11 @@ package controllers
 import (
   "net/http"
   "github.com/dgrijalva/jwt-go"
-  "services"
+  "github.com/Askadias/go-chat-cluster/services"
   "github.com/codegangsta/martini-contrib/render"
-  "conf"
+  "github.com/Askadias/go-chat-cluster/conf"
   "github.com/go-martini/martini"
-  "models"
+  "github.com/Askadias/go-chat-cluster/models"
 )
 
 func GetFriends(req *http.Request, render render.Render, friends services.Friends) {

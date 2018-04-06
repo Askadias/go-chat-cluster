@@ -2,13 +2,13 @@ package controllers
 
 import (
   "net/http"
-  "services"
-  "conf"
+  "github.com/Askadias/go-chat-cluster/services"
+  "github.com/Askadias/go-chat-cluster/conf"
   "log"
   "github.com/dgrijalva/jwt-go"
   "time"
   "github.com/codegangsta/martini-contrib/render"
-  "models"
+  "github.com/Askadias/go-chat-cluster/models"
 )
 
 type UserClaims struct {

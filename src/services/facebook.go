@@ -5,8 +5,8 @@ import (
   "io/ioutil"
   "encoding/json"
   "log"
-  "conf"
-  "models"
+  "github.com/Askadias/go-chat-cluster/conf"
+  "github.com/Askadias/go-chat-cluster/models"
   "time"
 )
 

@@ -2,20 +2,20 @@ package main
 
 import (
   "github.com/go-martini/martini"
-  "conf"
+  "github.com/Askadias/go-chat-cluster/conf"
   "net/http"
   "github.com/codegangsta/martini-contrib/render"
   "github.com/martini-contrib/gzip"
   "github.com/martini-contrib/sessions"
   "strconv"
   "github.com/dgrijalva/jwt-go"
-  "controllers"
+  "github.com/Askadias/go-chat-cluster/controllers"
   "github.com/codegangsta/martini-contrib/binding"
-  "models"
-  "services"
-  "middleware"
-  "middleware/auth"
-  "db"
+  "github.com/Askadias/go-chat-cluster/models"
+  "github.com/Askadias/go-chat-cluster/services"
+  "github.com/Askadias/go-chat-cluster/middleware"
+  "github.com/Askadias/go-chat-cluster/middleware/auth"
+  "github.com/Askadias/go-chat-cluster/db"
 )
 
 var jwtOptions = auth.Options{

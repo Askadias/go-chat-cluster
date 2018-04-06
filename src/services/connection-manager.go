@@ -1,12 +1,12 @@
 package services
 
 import (
-  "models"
+  "github.com/Askadias/go-chat-cluster/models"
   "encoding/json"
   "log"
   "sync"
-  "db"
-  "conf"
+  "github.com/Askadias/go-chat-cluster/db"
+  "github.com/Askadias/go-chat-cluster/conf"
 )
 
 type ConnectionManager struct {

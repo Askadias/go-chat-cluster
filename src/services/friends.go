@@ -1,8 +1,8 @@
 package services
 
 import (
-  "models"
-  "conf"
+  "github.com/Askadias/go-chat-cluster/models"
+  "github.com/Askadias/go-chat-cluster/conf"
 )
 
 type Friends interface {

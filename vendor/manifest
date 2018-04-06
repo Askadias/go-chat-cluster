@@ -47,14 +47,14 @@
 		{
 			"importpath": "github.com/garyburd/redigo/internal",
 			"repository": "https://github.com/garyburd/redigo",
-			"revision": "a7327d8ced8067e916e7e35490522fd0182fa839",
+			"revision": "569eae59ada904ea8db7a225c2b47165af08735a",
 			"branch": "master",
 			"path": "/internal"
 		},
 		{
 			"importpath": "github.com/garyburd/redigo/redis",
 			"repository": "https://github.com/garyburd/redigo",
-			"revision": "a7327d8ced8067e916e7e35490522fd0182fa839",
+			"revision": "569eae59ada904ea8db7a225c2b47165af08735a",
 			"branch": "master",
 			"path": "/redis"
 		},
@@ -73,7 +73,7 @@
 		{
 			"importpath": "github.com/gorilla/mux",
 			"repository": "https://github.com/gorilla/mux",
-			"revision": "4dbd923b0c9e99ff63ad54b0e9705ff92d3cdb06",
+			"revision": "94231ffd98496cbcb1c15b7bf2a9edfd5f852cd4",
 			"branch": "master"
 		},
 		{
@@ -85,7 +85,7 @@
 		{
 			"importpath": "github.com/gorilla/sessions",
 			"repository": "https://github.com/gorilla/sessions",
-			"revision": "7910f5bb5ac86ab08f97d8bda39b476fc117b684",
+			"revision": "a2f2a3de9a4a575047f73e3e36bc85ecc3546391",
 			"branch": "master"
 		},
 		{
