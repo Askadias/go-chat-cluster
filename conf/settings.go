@@ -32,7 +32,7 @@ func init() {
   mode := os.Getenv("MARTINI_ENV")
   switch mode {
   case "production":
-    FBTimeoutMS = 2000
+    FBTimeoutMS = 10000
     SessionSecret = os.Getenv("SESSION_SECRET")
     JWTSecret = os.Getenv("JWT_SECRET")
     ServerPort, _ = strconv.ParseInt(os.Getenv("PORT"), 10, 0)
@@ -46,7 +46,7 @@ func init() {
     FBClientID = "180253089366075"
     FBClientSecret = os.Getenv("FB_SECRET")
     FBRedirectURL = "http://localhost:3000/authorized"
-    FBTimeoutMS = 500
+    FBTimeoutMS = 10000
     FBBaseURL = "https://graph.facebook.com/v2.12"
     SessionSecret = "E4Nkf1ZZ5vRwB5CgvYMDzb12pQ7CU1Tg"
     JWTSecret = "BfqQHegw8cvC22unqNTiIuQVm89jSPLj"
