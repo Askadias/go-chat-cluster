@@ -30,28 +30,28 @@ var ChatLogLimit int
 
 func init() {
   mode := os.Getenv("MARTINI_ENV")
+  FBClientID = "180253089366075"
+  FBClientSecret = os.Getenv("FB_SECRET")
+  RedisURL = os.Getenv("REDIS_URL")
+  MongoURL = os.Getenv("MONGO_URL")
+  MongoDBName = os.Getenv("MONGO_DB_NAME")
+  MongoTimeout = 1 * time.Second
+  MaxChatMembers = 100
+  MaxOpenedChats = 10
+  FBBaseURL = "https://graph.facebook.com/v2.12"
+  FBTimeoutMS = 10000
+  ChatLogLimit = 10
+  JWTUserPropName = "user"
   switch mode {
   case "production":
-    FBTimeoutMS = 10000
+    FBRedirectURL = "https://hisc.herokuapp.com/authorized"
     SessionSecret = os.Getenv("SESSION_SECRET")
     JWTSecret = os.Getenv("JWT_SECRET")
     ServerPort, _ = strconv.ParseInt(os.Getenv("PORT"), 10, 0)
   default:
-    RedisURL = os.Getenv("REDIS_URL")
-    MongoURL = os.Getenv("MONGO_URL")
-    MongoDBName = os.Getenv("MONGO_DB_NAME")
-    MongoTimeout = 1 * time.Second
-    MaxChatMembers = 100
-    MaxOpenedChats = 10
-    FBClientID = "180253089366075"
-    FBClientSecret = os.Getenv("FB_SECRET")
     FBRedirectURL = "http://localhost:3000/authorized"
-    FBTimeoutMS = 10000
-    FBBaseURL = "https://graph.facebook.com/v2.12"
     SessionSecret = "E4Nkf1ZZ5vRwB5CgvYMDzb12pQ7CU1Tg"
     JWTSecret = "BfqQHegw8cvC22unqNTiIuQVm89jSPLj"
-    JWTUserPropName = "user"
     ServerPort = 3000
-    ChatLogLimit = 10
   }
 }
