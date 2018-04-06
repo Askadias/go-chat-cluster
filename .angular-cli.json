@@ -6,7 +6,7 @@
   "apps": [
     {
       "root": "client",
-      "outDir": "src/public",
+      "outDir": "public",
       "assets": [
         "assets",
         "chat-favicon-96x96.png"
