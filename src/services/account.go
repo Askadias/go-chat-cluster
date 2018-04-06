@@ -1,8 +1,8 @@
 package services
 
 import (
-  "github.com/Askadias/go-chat-cluster/conf"
-  "github.com/Askadias/go-chat-cluster/models"
+  "github.com/Askadias/go-chat-cluster/src/conf"
+  "github.com/Askadias/go-chat-cluster/src/models"
 )
 
 type Account interface {

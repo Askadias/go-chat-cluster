@@ -1,8 +1,8 @@
 package db
 
 import (
-  "github.com/Askadias/go-chat-cluster/models"
-  "github.com/Askadias/go-chat-cluster/conf"
+  "github.com/Askadias/go-chat-cluster/src/models"
+  "github.com/Askadias/go-chat-cluster/src/conf"
 )
 
 type Chat interface {

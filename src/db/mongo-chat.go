@@ -6,8 +6,8 @@ import (
   "net"
   "log"
   "time"
-  "github.com/Askadias/go-chat-cluster/models"
-  "github.com/Askadias/go-chat-cluster/conf"
+  "github.com/Askadias/go-chat-cluster/src/models"
+  "github.com/Askadias/go-chat-cluster/src/conf"
   "gopkg.in/mgo.v2/bson"
   "strings"
 )

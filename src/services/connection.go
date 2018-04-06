@@ -2,7 +2,7 @@ package services
 
 import (
   "github.com/gorilla/websocket"
-  "github.com/Askadias/go-chat-cluster/db"
+  "github.com/Askadias/go-chat-cluster/src/db"
 )
 
 type Connection struct {

@@ -3,16 +3,16 @@ package controllers
 import (
   "net/http"
   "github.com/gorilla/websocket"
-  "github.com/Askadias/go-chat-cluster/services"
+  "github.com/Askadias/go-chat-cluster/src/services"
   "github.com/dgrijalva/jwt-go"
   "github.com/codegangsta/martini-contrib/render"
-  "github.com/Askadias/go-chat-cluster/conf"
+  "github.com/Askadias/go-chat-cluster/src/conf"
   "log"
-  "github.com/Askadias/go-chat-cluster/models"
+  "github.com/Askadias/go-chat-cluster/src/models"
   "time"
   "github.com/go-martini/martini"
   "strconv"
-  "github.com/Askadias/go-chat-cluster/db"
+  "github.com/Askadias/go-chat-cluster/src/db"
 )
 
 // Initializes a WebSocket connection for the current user
