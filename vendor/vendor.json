@@ -1,0 +1,151 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "KINuoUfjPoHRf2fOfWmVHsmOh0s=",
+			"path": "github.com/auth0/go-jwt-middleware",
+			"revision": "5493cabe49f7bfa6e2ec444a09d334d90cd4e2bd",
+			"revisionTime": "2017-04-25T17:11:59Z"
+		},
+		{
+			"checksumSHA1": "SZyo8pcL9sjxyP/FwWzO7Zht54w=",
+			"path": "github.com/boj/redistore",
+			"revision": "4562487a4bee9a7c272b72bfaeda4917d0a47ab9",
+			"revisionTime": "2017-04-19T03:05:11Z"
+		},
+		{
+			"checksumSHA1": "1Hm7Ij3YHAqBbxLCcGr4NKbI6e0=",
+			"path": "github.com/codegangsta/inject",
+			"revision": "33e0aa1cb7c019ccc3fbe049a8262a6403d30504",
+			"revisionTime": "2015-01-14T23:56:00Z"
+		},
+		{
+			"checksumSHA1": "P252gIImNS/OQcBzCV8dM0hFWLo=",
+			"path": "github.com/codegangsta/martini",
+			"revision": "22fa46961aabd2665cf3f1343b146d20028f5071",
+			"revisionTime": "2017-01-21T21:58:54Z"
+		},
+		{
+			"checksumSHA1": "MOmcp3rKTRUVoSnbSfBVeM5bKwM=",
+			"path": "github.com/codegangsta/martini-contrib/binding",
+			"revision": "8ce6181c2609699e4c7cd30994b76a850a9cdadc",
+			"revisionTime": "2014-02-08T23:45:50Z"
+		},
+		{
+			"checksumSHA1": "fe0T7VI7Gro2MZ9p5t3nxKkFF2k=",
+			"path": "github.com/codegangsta/martini-contrib/render",
+			"revision": "8ce6181c2609699e4c7cd30994b76a850a9cdadc",
+			"revisionTime": "2014-02-08T23:45:50Z"
+		},
+		{
+			"checksumSHA1": "TyCPFVKUH57Fu2aLnuahZMC9fUs=",
+			"path": "github.com/codegangsta/negroni",
+			"revision": "22c5532ea862c34fdad414e90f8cc00b4f6f4cab",
+			"revisionTime": "2018-01-30T04:45:49Z"
+		},
+		{
+			"checksumSHA1": "S5uhI0PqtVwGWetaS82w62R8sZA=",
+			"path": "github.com/dgrijalva/jwt-go",
+			"revision": "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e",
+			"revisionTime": "2018-03-08T23:13:08Z"
+		},
+		{
+			"checksumSHA1": "6X3O3mfvOyiwV2iAb5GjxARs08c=",
+			"path": "github.com/garyburd/redigo/internal",
+			"revision": "a7327d8ced8067e916e7e35490522fd0182fa839",
+			"revisionTime": "2018-02-28T18:30:32Z"
+		},
+		{
+			"checksumSHA1": "TRsWhl8gX4p8xoErljH/oyNmY5M=",
+			"path": "github.com/garyburd/redigo/redis",
+			"revision": "a7327d8ced8067e916e7e35490522fd0182fa839",
+			"revisionTime": "2018-02-28T18:30:32Z"
+		},
+		{
+			"checksumSHA1": "AtI2wKvKTag/BASZPcdTd/KAjis=",
+			"path": "github.com/go-martini/martini",
+			"revision": "22fa46961aabd2665cf3f1343b146d20028f5071",
+			"revisionTime": "2017-01-21T21:58:54Z"
+		},
+		{
+			"checksumSHA1": "IkPM2QLv9urri7S49wzroQx9oXA=",
+			"path": "github.com/gorilla/context",
+			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"revisionTime": "2016-08-17T18:46:32Z"
+		},
+		{
+			"checksumSHA1": "CVss9W01Rrm2VlhhjW0z5D35Xo8=",
+			"path": "github.com/gorilla/mux",
+			"revision": "4dbd923b0c9e99ff63ad54b0e9705ff92d3cdb06",
+			"revisionTime": "2018-03-14T16:31:26Z"
+		},
+		{
+			"checksumSHA1": "GKB96ojS6AY/uBnfLWqZBsxTBY4=",
+			"path": "github.com/gorilla/securecookie",
+			"revision": "e59506cc896acb7f7bf732d4fdf5e25f7ccd8983",
+			"revisionTime": "2017-02-24T19:38:04Z"
+		},
+		{
+			"checksumSHA1": "MNrNztvWgUwDyhRDJQJNrVRrwjk=",
+			"path": "github.com/gorilla/sessions",
+			"revision": "7910f5bb5ac86ab08f97d8bda39b476fc117b684",
+			"revisionTime": "2018-03-12T18:45:12Z"
+		},
+		{
+			"checksumSHA1": "tvVmLXS0w9aMKlZkVyiECxtbZXI=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "eb925808374e5ca90c83401a40d711dc08c0c0f6",
+			"revisionTime": "2018-03-06T18:15:48Z"
+		},
+		{
+			"checksumSHA1": "kR/qnC9EghkNmPuwQ0o9vQHLwHo=",
+			"path": "github.com/martini-contrib/gzip",
+			"revision": "6c035326b43f79aa18793d2f1db512d21253ea61",
+			"revisionTime": "2015-11-24T21:41:56Z"
+		},
+		{
+			"checksumSHA1": "LK+8vyDFevUx3rIFD5GYkhUhfPA=",
+			"path": "github.com/martini-contrib/sessions",
+			"revision": "fa13114fbcf036dff8185d728651d85fcef772db",
+			"revisionTime": "2014-06-30T23:17:22Z"
+		},
+		{
+			"checksumSHA1": "+RPbt/bqx8qmTbdc2bL0cjCbVNg=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "36e9d2ebbde5e3f13ab2e25625fd453271d6522e",
+			"revisionTime": "2018-01-03T17:44:51Z"
+		},
+		{
+			"checksumSHA1": "YFQU7VULoTU4TwPz3V97b2exyxE=",
+			"path": "gopkg.in/mgo.v2",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "Kpt9VvtG+deoQ+p34F2CeTofTik=",
+			"path": "gopkg.in/mgo.v2/bson",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "9tMleZvl/yjpkj7oO3pOfZc+MJw=",
+			"path": "gopkg.in/mgo.v2/internal/json",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "WnXjUmdgl3mTwwqYBxbO974iCe8=",
+			"path": "gopkg.in/mgo.v2/internal/sasl",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "CrciG7woshiINwZxPsxisgDGL3Y=",
+			"path": "gopkg.in/mgo.v2/internal/scram",
+			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
+			"revisionTime": "2016-08-18T02:01:20Z"
+		}
+	],
+	"rootPath": "github.com/Askadias/go-chat-cluster"
+}

@@ -1,4 +1,4 @@
-package go_chat_cluster
+package main
 
 import (
   "github.com/go-martini/martini"
