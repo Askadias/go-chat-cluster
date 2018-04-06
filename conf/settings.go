@@ -32,7 +32,7 @@ func init() {
   mode := os.Getenv("MARTINI_ENV")
   switch mode {
   case "production":
-    FBTimeoutMS = 800
+    FBTimeoutMS = 2000
     SessionSecret = os.Getenv("SESSION_SECRET")
     JWTSecret = os.Getenv("JWT_SECRET")
     ServerPort, _ = strconv.ParseInt(os.Getenv("PORT"), 10, 0)
