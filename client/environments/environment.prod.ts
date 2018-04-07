@@ -8,5 +8,8 @@ export const environment = {
       authUri: 'https://www.facebook.com/dialog/oauth',
       scope: 'public_profile,user_friends'
     }
+  },
+  socket: {
+    maxSubscriptionRetries: 100
   }
 };

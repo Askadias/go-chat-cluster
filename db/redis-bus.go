@@ -28,9 +28,9 @@ func (bus *RedisBus) run() {
   if conn := bus.options.RedisPool.Get(); conn.Err() != nil {
     panic(conn.Err())
   } else {
-    defer conn.Close()
     bus.pubSubConn = &redis.PubSubConn{Conn: conn}
     defer bus.pubSubConn.Close()
+    defer conn.Close()
     for {
       switch v := bus.pubSubConn.Receive().(type) {
       case redis.Message:

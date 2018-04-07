@@ -6,6 +6,10 @@ import {User} from "../domain/user";
 import {AuthService} from "../services/auth.service";
 import {Room} from "../domain/room";
 import {RoomContainer} from "../domain/room-container";
+import {Message} from "../domain/message";
+import {range} from 'rxjs/observable/range'
+import {zip} from 'rxjs/observable/zip'
+import {timer} from 'rxjs/observable/timer'
 
 @Component({
   selector: 'chat-component',
@@ -54,85 +58,60 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.chat.getEventListener().subscribe(event => {
-      if (event.type === 'message') {
-        if (event.data.room) {
-          if (event.data.type === 'update') {
+    this.chat.getSocket().retryWhen(function (errors) {
+      return zip(
+        range(1, env.socket.maxSubscriptionRetries), errors, function (i, e) {
+          return i
+        })
+        .flatMap(function (i) {
+          console.log("delay retry by " + i + " second(s)");
+          return timer(i * 1000);
+        });
+    }).subscribe((message: Message) => {
+      if (message.room) {
+        if (message.type === 'update') {
+          this.loading = false;
+          this.chat.getRoom(message.room).subscribe(
+            (room) => {
+              this.loading = false;
+              const roomContainer = new RoomContainer(this.profile, room, this.auth, this.chat);
+              const idx = this.rooms.findIndex(roomContainer =>
+                roomContainer.room.id === message.room
+              );
+              if (idx > -1) {
+                this.rooms[idx] = roomContainer;
+                if (this.activeRoom && this.activeRoom.room.id == room.id) {
+                  this.activeRoom = roomContainer;
+                }
+              } else {
+                this.rooms.push(roomContainer);
+              }
+            }, (error) => {
+              this.loading = false;
+              if (error.status == 404) {
+                this.removeRoomFromPool(message.room)
+              } else {
+                this.errors = [error.message];
+              }
+            }
+          )
+        } else {
+          const targetChat = this.rooms.find((roomContainer) =>
+            roomContainer.room.id === message.room
+          );
+          if (targetChat) {
+            targetChat.onMessageReceive(message)
+          } else {
             this.loading = false;
-            this.chat.getRoom(event.data.room).subscribe(
+            this.chat.getRoom(message.room).subscribe(
               (room) => {
                 this.loading = false;
-                const roomContainer = new RoomContainer(this.profile, room, this.auth, this.chat);
-                const idx = this.rooms.findIndex(roomContainer =>
-                  roomContainer.room.id === event.data.room
-                );
-                if (idx > -1) {
-                  this.rooms[idx] = roomContainer;
-                  if (this.activeRoom && this.activeRoom.room.id == room.id) {
-                    this.activeRoom = roomContainer;
-                  }
-                } else {
-                  this.rooms.push(roomContainer);
-                }
+                this.rooms.push(new RoomContainer(this.profile, room, this.auth, this.chat));
               }, (error) => {
                 this.loading = false;
-                if (error.status == 404) {
-                  this.removeRoomFromPool(event.data.room)
-                } else {
-                  this.errors = [error.message];
-                }
+                this.errors = [error.message];
               }
             )
-          } else {
-            const targetChat = this.rooms.find((roomContainer) =>
-              roomContainer.room.id === event.data.room
-            );
-            if (targetChat) {
-              targetChat.onMessageReceive(event.data)
-            } else {
-              this.loading = false;
-              this.chat.getRoom(event.data.room).subscribe(
-                (room) => {
-                  this.loading = false;
-                  this.rooms.push(new RoomContainer(this.profile, room, this.auth, this.chat));
-                }, (error) => {
-                  this.loading = false;
-                  this.errors = [error.message];
-                }
-              )
-            }
-          }
-        }
-      }
-      if (event.type == "close") {
-        if (event.data.room) {
-          const targetChat = this.rooms.find((roomContainer) =>
-            roomContainer.room.id === event.data.room
-          );
-          if (targetChat) {
-            let senderId = event.data.from;
-            if (senderId) {
-              let sender = targetChat.accounts.get(senderId);
-              if (sender) {
-                sender.online = false
-              }
-            }
-          }
-        }
-      }
-      if (event.type == "open") {
-        if (event.data.room) {
-          const targetChat = this.rooms.find((roomContainer) =>
-            roomContainer.room.id === event.data.room
-          );
-          if (targetChat) {
-            let senderId = event.data.from;
-            if (senderId) {
-              let sender = targetChat.accounts.get(senderId);
-              if (sender) {
-                sender.online = true
-              }
-            }
           }
         }
       }
@@ -212,13 +191,13 @@ export class ChatComponent implements OnInit {
   }
 
   removeRoomFromPool(roomId) {
-      this.rooms.splice(
-        this.rooms.findIndex((it) => it.room.id === roomId),
-        1
-      );
-      if (this.activeRoom.room.id === roomId) {
-        this.closeChat();
-      }
+    this.rooms.splice(
+      this.rooms.findIndex((it) => it.room.id === roomId),
+      1
+    );
+    if (this.activeRoom.room.id === roomId) {
+      this.closeChat();
+    }
   }
 
   trackByUserId(index: number, friend: User): string {

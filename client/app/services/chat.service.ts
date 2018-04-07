@@ -1,27 +1,17 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {Message} from "../domain/message";
 import {Room} from "../domain/room";
 
 @Injectable()
 export class ChatService {
 
-  private socket: WebSocket;
-  private listener: EventEmitter<any> = new EventEmitter();
+  private socket: Observable<Message>;
 
   constructor(private http: HttpClient) {
     const loc = window.location;
-    this.socket = new WebSocket(`${loc.protocol === 'https:' ? 'wss:' : 'ws:'}//${loc.host}/api/ws`);
-    this.socket.onopen = event => {
-      this.listener.emit({type: 'open', data: event});
-    };
-    this.socket.onclose = event => {
-      this.listener.emit({type: 'close', data: event});
-    };
-    this.socket.onmessage = event => {
-      this.listener.emit({type: 'message', data: JSON.parse(event.data)});
-    };
+    this.socket = Observable.webSocket(`${loc.protocol === 'https:' ? 'wss:' : 'ws:'}//${loc.host}/api/ws`);
   }
 
   getChatLog(roomId: string, from: number, limit: number): Observable<Message[]> {
@@ -56,11 +46,7 @@ export class ChatService {
     return this.http.delete(`/api/rooms/${roomId}`);
   }
 
-  close() {
-    this.socket.close();
-  }
-
-  getEventListener() {
-    return this.listener;
+  getSocket(): Observable<Message> {
+    return this.socket;
   }
 }
