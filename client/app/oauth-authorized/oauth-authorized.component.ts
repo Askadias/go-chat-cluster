@@ -12,7 +12,7 @@ export class OauthAuthorizedComponent implements OnInit {
 
   errors: string[];
   verifying = true;
-  isPopup = false;
+  isPopup = true;
   returnTo = '/';
 
   constructor(private auth: AuthService,
@@ -30,9 +30,11 @@ export class OauthAuthorizedComponent implements OnInit {
     const localState = localStorage.getItem('oauth_state');
     let state: any;
     if (!localState || externalState !== localState) {
+      console.log(`Original state ${localState} is not equal to provided ${externalState}`);
       this.errors.push(OAUTH_INVALID_STATE_ERROR);
     } else {
       try {
+        console.log(`Failed to parse provided state: ${externalState}`);
         state = JSON.parse(atob(externalState));
       } catch (err) {
         this.errors.push(OAUTH_INVALID_STATE_ERROR);

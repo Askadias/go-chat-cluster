@@ -4,3 +4,14 @@
     font-weight: bold;
   }
 }
+
+.chat-logo {
+  position: absolute;
+  top: -56px;
+  width: 100px;
+  height: 100px;
+  background: url(../../assets/img/chat-logo.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
