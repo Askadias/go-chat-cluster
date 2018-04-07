@@ -99,6 +99,12 @@
 			"revisionTime": "2018-03-06T18:15:48Z"
 		},
 		{
+			"checksumSHA1": "9wvd4LK3SQ0oCrbs3Kr5CB1hQMM=",
+			"path": "github.com/kelseyhightower/envconfig",
+			"revision": "b2c5c876e2659d9060d82e9b8494150d53854cc4",
+			"revisionTime": "2018-03-08T19:05:16Z"
+		},
+		{
 			"checksumSHA1": "kR/qnC9EghkNmPuwQ0o9vQHLwHo=",
 			"path": "github.com/martini-contrib/gzip",
 			"revision": "6c035326b43f79aa18793d2f1db512d21253ea61",
