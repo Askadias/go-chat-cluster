@@ -7,7 +7,6 @@ import (
   "log"
   "github.com/Askadias/go-chat-cluster/conf"
   "github.com/Askadias/go-chat-cluster/models"
-  "time"
 )
 
 // Error in the format returned by the facebook.com
@@ -31,7 +30,7 @@ func NewFacebook(options conf.FacebookConf) (f *Facebook) {
   f = &Facebook{
     options: options,
     facebookClient: &http.Client{
-      Timeout: time.Millisecond * options.TimeoutMS,
+      Timeout: options.Timeout,
     },
   }
   if err := f.setupClientToken(); err != nil {

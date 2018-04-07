@@ -3,8 +3,6 @@ package conf
 import (
   "time"
   "github.com/kelseyhightower/envconfig"
-  "strconv"
-  "os"
 )
 
 var System SystemConf
@@ -13,59 +11,60 @@ type SystemConf struct {
   // Application host
   Host string
   // Application port (3000 by default)
-  Port int
+  Port int `default:"3000"`
   // HTTP Session encryption secret key
-  SessionSecret string
+  SessionSecret string `default:"E4Nkf1ZZ5vRwB5CgvYMDzb12pQ7CU1Tg"`
   // User Authentication JWT encryption key
-  JWTSecret string
+  JWTSecret string `default:"BfqQHegw8cvC22unqNTiIuQVm89jSPLj"`
   // User property name to store in the request context
-  JWTUserPropName string
+  JWTUserPropName string `default:"user"`
 }
 
 var Socket SocketConf
 
 type SocketConf struct {
   // Time allowed to write a message to the peer.
-  WriteWait time.Duration
+  WriteWait time.Duration `default:"10s",split_words:"true"`
   // Time allowed to read the next pong message from the peer.
-  PongWait time.Duration
+  PongWait time.Duration `default:"60s",split_words:"true"`
   // Send pings to peer with this period. Must be less than pongWait.
-  PingPeriod time.Duration
+  PingPeriod time.Duration `default:"54s",split_words:"true"`
   // Maximum message size allowed from peer.
-  MaxMessageSize int64
+  MaxMessageSize int64 `default:"1024",split_words:"true"`
   // HandshakeTimeout specifies the duration for the handshake to complete.
-  HandshakeTimeout time.Duration
+  HandshakeTimeout time.Duration `default:"10s",split_words:"true"`
   // ReadBufferSize and WriteBufferSize specify I/O buffer sizes. If a buffer
   // size is zero, then buffers allocated by the HTTP server are used. The
   // I/O buffer sizes do not limit the size of the messages that can be sent
   // or received.
-  ReadBufferSize, WriteBufferSize int
+  ReadBufferSize  int `default:"1024",split_words:"true"`
+  WriteBufferSize int `default:"1024",split_words:"true"`
 }
 
 var Facebook FacebookConf
 
 type FacebookConf struct {
   // Facebook application client ID
-  ClientID string
+  ClientID string `default:"180253089366075"`
   // Facebook application client secret
   ClientSecret string
   // Authorization URL registered in facebook as allowed for redirection
-  RedirectURL string
+  RedirectURL string `default:"http://localhost:3000/authorized"`
   // Facebook request timeout
-  TimeoutMS time.Duration
+  Timeout time.Duration `default:"5s"`
   // Base url for the facebook graph API
-  BaseURL string
+  BaseURL string `default:"https://graph.facebook.com/v2.12"`
 }
 
 var Chat ChatConf
 
 type ChatConf struct {
   // Maximum number of members allowed for a single room
-  MaxMembers int
+  MaxMembers int `default:"100"`
   // Maximum number of opened chat rooms per user
-  MaxOpenedRooms int
+  MaxOpenedRooms int `default:"10"`
   // Default limit of messages to be returned with a single request
-  DefaultMessagesLimit int
+  DefaultMessagesLimit int `default:"10"`
 }
 
 var Redis RedisConf
@@ -73,14 +72,14 @@ var Redis RedisConf
 type RedisConf struct {
   URL string
   // Maximum number of idle connections in the pool.
-  MaxIdle int
+  MaxIdle int `default:"16"`
   // Maximum number of connections allocated by the pool at a given time.
   // When zero, there is no limit on the number of connections in the pool.
-  MaxActive int
+  MaxActive int `default:"16"`
   // Close connections after remaining idle for this duration. If the value
   // is zero, then idle connections are not closed. Applications should set
   // the timeout to a value less than the server's timeout.
-  IdleTimeout time.Duration
+  IdleTimeout time.Duration `default:"1s"`
   // Close connections older than this duration. If the value is zero, then
   // the pool does not close connections based on age.
   MaxConnLifetime time.Duration
@@ -92,52 +91,17 @@ type MongoConf struct {
   // Full MongoDB url
   URL string
   // Mongo Database Name
-  DBName string
+  DBName string `default:"go-chat-cluster"`
   // Operation timeout
-  Timeout time.Duration
+  Timeout time.Duration `default:"1s"`
   // Collection name for storing chat room info
-  RoomCollectionName string
+  RoomCollectionName string `default:"rooms"`
   // Collection name for storing chat log
-  MessagesCollectionName string
+  MessagesCollectionName string `default:"messages"`
 }
 
 func init() {
-  if port, err := strconv.ParseInt(os.Getenv("PORT"), 10, 0); err != nil || port == 0 {
-    System.Port = 3000
-  } else {
-    System.Port = int(port)
-  }
-  System.SessionSecret = "E4Nkf1ZZ5vRwB5CgvYMDzb12pQ7CU1Tg"
-  System.JWTSecret = "BfqQHegw8cvC22unqNTiIuQVm89jSPLj"
-  System.JWTUserPropName = "user"
-
-  Socket.WriteWait = 10 * time.Second
-  Socket.PongWait = 60 * time.Second
-  Socket.PingPeriod = (Socket.PongWait * 9) / 10
-  Socket.HandshakeTimeout = 10 * time.Second
-  Socket.MaxMessageSize = 1024
-  Socket.ReadBufferSize = 1024
-  Socket.WriteBufferSize = 1024
-
-  Facebook.ClientID = "180253089366075"
-  Facebook.BaseURL = "https://graph.facebook.com/v2.12"
-  Facebook.RedirectURL = "http://localhost:3000/authorized"
-  Facebook.TimeoutMS = 10000
-
-  Redis.IdleTimeout = 1 * time.Second
-  Redis.MaxActive = 16
-  Redis.MaxIdle = 16
-
-  Mongo.Timeout = 1 * time.Second
-  Mongo.DBName = "go-chat-cluster"
-  Mongo.RoomCollectionName = "rooms"
-  Mongo.MessagesCollectionName = "messages"
-
-  Chat.MaxMembers = 100
-  Chat.MaxOpenedRooms = 10
-  Chat.DefaultMessagesLimit = 10
-
-  err := envconfig.Process("System", &System)
+  err := envconfig.Process("", &System)
   if err != nil {
     panic("Unable to load 'System' config: " + err.Error())
   }
