@@ -1,11 +1,17 @@
-.socialBtn {
-  color: white;
-  font-weight: bold;
-}
-
 .facebookBtn {
-  @extend .socialBtn;
+  color: white;
+  margin: auto;
+  font-weight: bold;
+  white-space: pre-line;
+  max-width: 230px;
+  height: 200px;
+  line-height: 25px;
   background-color: #4267b2;
+  .fb-icon {
+    width: 64px;
+    height: 64px;
+    margin: -20px 10px 10px;
+  }
 }
 
 .chat-logo {

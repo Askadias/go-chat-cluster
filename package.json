@@ -29,9 +29,11 @@
     "@angular/platform-browser": "^5.2.5",
     "@angular/platform-browser-dynamic": "^5.2.5",
     "@angular/router": "^5.2.5",
+    "@ctrl/ngx-emoji-mart": "^0.2.1",
     "core-js": "^2.4.1",
     "jwt-decode": "^2.2.0",
     "ngx-cookie-service": "^1.0.10",
+    "ngx-wig": "^1.2.4",
     "rxjs": "^5.5.2",
     "uuid": "^3.2.1",
     "zone.js": "^0.8.14"

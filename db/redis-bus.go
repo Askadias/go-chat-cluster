@@ -3,6 +3,7 @@ package db
 import (
   "github.com/garyburd/redigo/redis"
   "log"
+  "github.com/Askadias/go-chat-cluster/conf"
 )
 
 type RedisOptions struct {
@@ -54,7 +55,11 @@ func (bus *RedisBus) Receive() chan map[string][]byte {
 }
 
 func (bus *RedisBus) Subscribe(id string) error {
-  return bus.pubSubConn.Subscribe(id)
+  if bus.pubSubConn != nil {
+    return bus.pubSubConn.Subscribe(id)
+  } else {
+    return conf.ErrNotInitialized
+  }
 }
 
 func (bus *RedisBus) Unsubscribe(id string) error {

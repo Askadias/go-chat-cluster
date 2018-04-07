@@ -25,6 +25,21 @@ func GetFriends(req *http.Request, render render.Render, friends services.Friend
   }
 }
 
+func HasFriendsPermissions(req *http.Request, res http.ResponseWriter, render render.Render, friends services.Friends) {
+  tkn := req.Context().Value("user").(*jwt.Token)
+  if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
+    profileID := claims["jti"]
+
+    if err := friends.HasFriendsPermissions(profileID.(string)); err != nil {
+      render.JSON(err.HttpCode, err)
+    } else {
+      res.WriteHeader(http.StatusOK)
+    }
+  } else {
+    render.JSON(http.StatusUnauthorized, conf.ErrInvalidToken)
+  }
+}
+
 func GetUser(params martini.Params, render render.Render, account services.Account) {
   userID := params["id"]
   if user, err := account.GetUser(userID); err != nil {

@@ -11,5 +11,8 @@ export const environment = {
   },
   socket: {
     maxSubscriptionRetries: 100
+  },
+  chat: {
+    closeMessagesRangeSec: 60
   }
 };

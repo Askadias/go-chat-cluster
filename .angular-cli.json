@@ -20,7 +20,8 @@
       "prefix": "chat",
       "styles": [
         "styles.scss",
-        "themes.scss"
+        "themes.scss",
+        "../node_modules/@ctrl/ngx-emoji-mart/picker.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",

@@ -44,7 +44,7 @@
   .chat-log-container {
     position: absolute;
     top: 30px;
-    bottom: 55px;
+    bottom: 64px;
     left: 0;
     right: 0;
     .chat-log {
@@ -159,6 +159,15 @@
               }
             }
           }
+
+          &.join {
+            padding-bottom: 0;
+            margin-bottom: -10px;
+            .chat-message-text {
+              border-bottom-left-radius: 0;
+              border-bottom-right-radius: 0;
+            }
+          }
         }
       }
     }
@@ -170,19 +179,41 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 70px;
+    height: 80px;
     z-index: 1;
-    overflow: hidden;
 
     .chat-form {
-      margin: 15px 10px 0 10px;
+      margin: 14px 0 0 10px;
       width: calc(100% - 25px);
 
       .chat-input-field {
         width: 100%;
         color: white;
+        > .nw-toolbar {
+          display: none;
+        }
+      }
+      .emoji-picker {
+        position: absolute;
+        top: -400px;
+        right: 0;
+        .emoji-close-overlay {
+          position: fixed;
+          background: transparent;
+          top: 0;
+          right: 0;
+          left: 0;
+          bottom: 0;
+          z-index: 0;
+        }
+      }
+      .chat-emoji-btn {
+        position: relative;
+        margin-top: 20px;
+        margin-left: 6px;
       }
       .chat-send-btn {
+        position: relative;
         margin-top: 20px;
         margin-left: 6px;
       }

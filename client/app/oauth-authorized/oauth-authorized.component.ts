@@ -26,14 +26,14 @@ export class OauthAuthorizedComponent implements OnInit {
     this.verifying = true;
     this.errors = [];
     const params = this.route.snapshot.queryParams;
-    const externalState = params.state;
-    const localState = sessionStorage.getItem('oauth_state');
+    const externalState = (<any>window).decodeURIComponent(params.state);
+    const localState = localStorage.getItem('oauth_state');
     let state: any;
     if (!localState || externalState !== localState) {
       this.errors.push(OAUTH_INVALID_STATE_ERROR);
     } else {
       try {
-        state = JSON.parse((<any>window).decodeURIComponent(atob(externalState)));
+        state = JSON.parse(atob(externalState));
       } catch (err) {
         this.errors.push(OAUTH_INVALID_STATE_ERROR);
       }

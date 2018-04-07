@@ -14,6 +14,7 @@
         <div *ngFor="let message of _room.messages; let i = index"
              class="chat-message"
              [class.mine]="message.from == _room.me.id"
+             [class.join]="isNearestMessage(message, i)"
              [class.head]="isHeadMessage(message, i)">
           <div class="chat-message-from">
             <div class="chat-avatar-container" fxFlex="48px" *ngIf="isHeadMessage(message, i)">
@@ -29,7 +30,7 @@
             {{message.body}}
           </div>
           <div class="chat-message-timestamp" *ngIf="isHeadMessage(message, i)">
-              {{ message.timestamp | date: 'hh:mm' }}
+              {{ getTimestamp(message) | date:'medium' }}
           </div>
         </div>
       </div>
@@ -37,13 +38,25 @@
   </div>
   <div class="chat-input">
     <form class="chat-form" fxLayout="row">
-      <mat-form-field class="chat-input-field" fl>
+      <mat-form-field class="chat-input-field">
         <input matInput id="message" name="message"
                placeholder="Message"
-               [formControl]="messageInput"
                [(ngModel)]="_room.newMessage">
       </mat-form-field>
-      <button class="flat-button chat-send-btn" (click)="sendMessage()">
+      <button class="flat-button chat-emoji-btn" type="button" (click)="toggleEmojiPicker()">
+        <mat-icon class="md-24">tag_faces</mat-icon>
+      </button>
+      <div class="emoji-picker" *ngIf="emojiPickerOpened">
+        <div class="emoji-close-overlay" (click)="emojiPickerOpened = false"></div>
+        <emoji-mart title="Pick your emoji…"
+                    perLine="7"
+                    emojiTooltip="true"
+                    title=""
+                    native="true"
+                    (emojiClick)="pickEmoji($event);">
+        </emoji-mart>
+      </div>
+      <button class="flat-button chat-send-btn" type="submit" (click)="sendMessage()">
         <mat-icon class="md-24">send</mat-icon>
       </button>
     </form>

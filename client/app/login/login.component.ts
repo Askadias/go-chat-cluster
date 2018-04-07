@@ -10,7 +10,6 @@ import {AuthService} from "../services/auth.service";
 })
 export class LoginComponent implements OnInit {
 
-  private oauthConfig: any;
   private isPopup = true;
   errors: string[] = [];
   submitting = false;
@@ -18,7 +17,6 @@ export class LoginComponent implements OnInit {
   constructor(public route: ActivatedRoute,
               protected auth: AuthService,
               protected router: Router) {
-    this.oauthConfig = env.oauth;
   }
 
   ngOnInit() {
@@ -53,28 +51,6 @@ export class LoginComponent implements OnInit {
   }
 
   loginWith(provider: string) {
-    const extAuthURL = this.buildClientAuthUri(this.oauthConfig[provider], provider);
-    if (this.isPopup) {
-      window.open(
-        extAuthURL,
-        `Login with ${provider}`,
-        'width=400,height=600');
-    } else {
-      window.location.replace(extAuthURL)
-    }
+    this.auth.loginWith(provider, this.isPopup, false, false);
   }
-
-  buildClientAuthUri(conf, provider) {
-    const {authUri, clientId, scope} = conf;
-    const redirectUri = this.oauthConfig.redirectUri;
-
-    const state = (<any>window).encodeURIComponent(btoa(JSON.stringify({
-      randomString: Math.random().toString(36).slice(2),
-      oauthRedirectUrl: `${this.oauthConfig.oAuthRedirectUriBase}/${provider}`,
-      isPopup: this.isPopup
-    })));
-    sessionStorage.setItem('oauth_state', state);
-    return `${authUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}&response_type=code&display=popup`;
-  }
-
 }

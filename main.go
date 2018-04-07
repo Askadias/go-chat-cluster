@@ -77,6 +77,7 @@ func main() {
   m.Use(render.Renderer())
   router.Group("/api", func(r martini.Router) {
     r.Get("/friends", jwtMiddleware.CheckJWT, controllers.GetFriends)
+    r.Get("/friends/permissions", jwtMiddleware.CheckJWT, controllers.HasFriendsPermissions)
     r.Get("/users", jwtMiddleware.CheckJWT, controllers.GetUsers)
     r.Get("/users/:id", jwtMiddleware.CheckJWT, controllers.GetUser)
     r.Get("/rooms", jwtMiddleware.CheckJWT, controllers.GetRooms)

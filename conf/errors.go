@@ -24,11 +24,12 @@ var (
   ErrFriendsNoPermissions = &ApiError{4, http.StatusForbidden, "No permissions to fetch friends"}
   ErrNotAnOwner           = &ApiError{5, http.StatusForbidden, "Sorry, only owner can modify a chat room"}
   ErrNotAMember           = &ApiError{6, http.StatusForbidden, "Sorry, you are not a member of this chat room"}
-  ErrInvalidId          = &ApiError{7, http.StatusBadRequest, "Invalid id specified"}
-  ErrNotFound           = &ApiError{8, http.StatusNotFound, "Nothing to update"}
-  ErrAlreadyExists      = &ApiError{9, http.StatusBadRequest, "Already exists"}
-  ErrTooManyMembers     = &ApiError{10, http.StatusBadRequest, "Too many members"}
-  ErrTooManyChatsOpened = &ApiError{11, http.StatusBadRequest, "Too many rooms opened"}
-  ErrNotAFriend         = &ApiError{12, http.StatusForbidden, "Only friend can be invited to a chat room"}
-  ErrBroadcastFailure   = &ApiError{13, http.StatusInternalServerError, "Unable to broadcast message"}
+  ErrInvalidId            = &ApiError{7, http.StatusBadRequest, "Invalid id specified"}
+  ErrNotFound             = &ApiError{8, http.StatusNotFound, "Nothing to update"}
+  ErrAlreadyExists        = &ApiError{9, http.StatusBadRequest, "Already exists"}
+  ErrTooManyMembers       = &ApiError{10, http.StatusBadRequest, "Too many members"}
+  ErrTooManyChatsOpened   = &ApiError{11, http.StatusBadRequest, "Too many rooms opened"}
+  ErrNotAFriend           = &ApiError{12, http.StatusForbidden, "Only friend can be invited to a chat room"}
+  ErrBroadcastFailure     = &ApiError{13, http.StatusInternalServerError, "Unable to broadcast message"}
+  ErrNotInitialized       = &ApiError{14, http.StatusInternalServerError, "Component not initialized yet"}
 )

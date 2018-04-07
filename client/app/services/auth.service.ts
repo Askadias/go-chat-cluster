@@ -5,6 +5,7 @@ import * as jwt_decode from 'jwt-decode';
 import {Router} from "@angular/router";
 import {User} from "../domain/user";
 import {CookieService} from "ngx-cookie-service";
+import {environment as env} from "../../environments/environment";
 
 export const ACCESS_TOKEN: string = 'JWT';
 export const USER_ID: string = 'USER_ID';
@@ -46,6 +47,10 @@ export class AuthService {
     return this.http.get<User[]>('/api/friends');
   }
 
+  hasFriendsPermissions(): Observable<any> {
+    return this.http.get<any>('/api/friends/permissions');
+  }
+
   getUser(userId: string): Observable<User> {
     return this.http.get<User>(`/api/users/${userId}`);
   }
@@ -80,5 +85,35 @@ export class AuthService {
     const date = this.getTokenExpirationDate(token);
     if (date === undefined) return false;
     return !(date.valueOf() > new Date().valueOf());
+  }
+
+  loginWith(provider: string, isPopup: boolean, force: boolean, redirectBack: boolean) {
+    const extAuthURL = this.buildClientAuthUri(env.oauth[provider], provider, isPopup, force, redirectBack);
+    if (isPopup) {
+      window.open(
+        extAuthURL,
+        `Login with ${provider}`,
+        'width=400,height=600');
+    } else {
+      window.location.replace(extAuthURL)
+    }
+  }
+
+  buildClientAuthUri(conf, provider, isPopup: boolean, force: boolean, redirectBack: boolean) {
+    const {authUri, clientId, scope} = conf;
+    const redirectUri = env.oauth.redirectUri;
+
+    const rawState = btoa(JSON.stringify({
+      randomString: Math.random().toString(36).slice(2),
+      oauthRedirectUrl: redirectBack ? window.location.href : `${env.oauth.oAuthRedirectUriBase}/${provider}`,
+      isPopup: isPopup
+    }));
+    localStorage.setItem('oauth_state', rawState);
+    const state = (<any>window).encodeURIComponent(rawState);
+    var resultUrl = `${authUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}&response_type=code&display=popup`;
+    if (force) {
+      resultUrl += '&auth_type=rerequest';
+    }
+    return resultUrl;
   }
 }

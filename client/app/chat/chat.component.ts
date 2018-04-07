@@ -19,39 +19,57 @@ import {timer} from 'rxjs/observable/timer'
 export class ChatComponent implements OnInit {
 
   protected oauthConfig: any;
+  private isPopup = true;
   errors: string[] = [];
   profile: User;
   friends: User[] = [];
   rooms: RoomContainer[] = [];
   activeRoom: RoomContainer;
-  loading = false;
+  loadingFriends = false;
+  loadingRooms = false;
   foldSocialBar = false;
   chatOpened = false;
+  hasFriendsPermissions = false;
 
   constructor(public route: ActivatedRoute,
               private auth: AuthService,
               private chat: ChatService) {
     this.oauthConfig = env.oauth;
-    this.loading = true;
+    this.loadingFriends = true;
     this.profile = auth.getProfile();
     this.activeRoom = null;
+    const routeSnapshot = this.route.snapshot;
+    this.isPopup = routeSnapshot.queryParams.isPopup || true;
     this.auth.getFriends().subscribe(
       (friends) => {
-        this.loading = false;
+        this.loadingFriends = false;
         this.friends = friends;
-        this.chat.getRooms().subscribe(
-          (rooms) => {
-            this.loading = false;
-            if (rooms) {
-              this.rooms = rooms.map((room) => new RoomContainer(this.profile, room, this.auth, this.chat));
+        if (!friends || friends.length == 0) {
+          this.chat.getRooms().subscribe(
+            () => {
+              this.hasFriendsPermissions = false;
+            }, (error) => {
+              this.hasFriendsPermissions = false;
+              this.errors = [error.message];
             }
-          }, (error) => {
-            this.loading = false;
-            this.errors = [error.message];
-          }
-        );
+          )
+        } else {
+          this.hasFriendsPermissions = true;
+          this.loadingRooms = true;
+          this.chat.getRooms().subscribe(
+            (rooms) => {
+              this.loadingRooms = false;
+              if (rooms) {
+                this.rooms = rooms.map((room) => new RoomContainer(this.profile, room, this.auth, this.chat));
+              }
+            }, (error) => {
+              this.loadingRooms = false;
+              this.errors = [error.message];
+            }
+          );
+        }
       }, (error) => {
-        this.loading = false;
+        this.loadingFriends = false;
         this.errors = [error.message];
       }
     );
@@ -70,10 +88,10 @@ export class ChatComponent implements OnInit {
     }).subscribe((message: Message) => {
       if (message.room) {
         if (message.type === 'update') {
-          this.loading = false;
+          this.loadingRooms = false;
           this.chat.getRoom(message.room).subscribe(
             (room) => {
-              this.loading = false;
+              this.loadingRooms = false;
               const roomContainer = new RoomContainer(this.profile, room, this.auth, this.chat);
               const idx = this.rooms.findIndex(roomContainer =>
                 roomContainer.room.id === message.room
@@ -87,7 +105,7 @@ export class ChatComponent implements OnInit {
                 this.rooms.push(roomContainer);
               }
             }, (error) => {
-              this.loading = false;
+              this.loadingRooms = false;
               if (error.status == 404) {
                 this.removeRoomFromPool(message.room)
               } else {
@@ -102,13 +120,13 @@ export class ChatComponent implements OnInit {
           if (targetChat) {
             targetChat.onMessageReceive(message)
           } else {
-            this.loading = false;
+            this.loadingRooms = false;
             this.chat.getRoom(message.room).subscribe(
               (room) => {
-                this.loading = false;
+                this.loadingRooms = false;
                 this.rooms.push(new RoomContainer(this.profile, room, this.auth, this.chat));
               }, (error) => {
-                this.loading = false;
+                this.loadingRooms = false;
                 this.errors = [error.message];
               }
             )
@@ -116,6 +134,10 @@ export class ChatComponent implements OnInit {
         }
       }
     })
+  }
+
+  loginWith(provider: string) {
+    this.auth.loginWith(provider, this.isPopup, true, true);
   }
 
   logout() {
@@ -134,12 +156,12 @@ export class ChatComponent implements OnInit {
     } else {
       this.chat.newRoom(new Room(this.profile.id, userId)).subscribe(
         (newRoom) => {
-          this.loading = false;
+          this.loadingRooms = false;
           const roomContainer = new RoomContainer(this.profile, newRoom, this.auth, this.chat);
           this.rooms.push(roomContainer);
           this.switchToChat(roomContainer)
         }, (error) => {
-          this.loading = false;
+          this.loadingRooms = false;
           this.errors = [error.message];
         }
       );
@@ -179,12 +201,12 @@ export class ChatComponent implements OnInit {
   }
 
   dismissChat(roomContainer: RoomContainer) {
-    this.loading = true;
+    this.loadingRooms = true;
     this.chat.deleteRoom(roomContainer.room.id).subscribe(() => {
-        this.loading = false;
+        this.loadingRooms = false;
         this.removeRoomFromPool(roomContainer.room.id);
       }, (error) => {
-        this.loading = false;
+        this.loadingRooms = false;
         this.errors = [error.message];
       }
     )

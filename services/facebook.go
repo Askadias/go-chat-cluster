@@ -14,6 +14,14 @@ type FBError struct {
   Error conf.ApiError `json:"error"`
 }
 
+type FBPermissionsResponse struct {
+  data []FBPermission
+}
+type FBPermission struct {
+  permission string
+  status     string
+}
+
 // Facebook Service performs necessary operations related to the Facebook.com social network such as:
 //    - retrieving client token by service credentials
 //    - exchanging authorization code to access token
@@ -162,6 +170,32 @@ func (f *Facebook) GetFriends(profileID string) ([]models.User, *conf.ApiError) 
     friends.Data[i].AvatarURL = f.options.BaseURL + "/" + friends.Data[i].ID + "/picture"
   }
   return friends.Data, nil
+}
+
+func (f *Facebook) HasFriendsPermissions(profileID string) *conf.ApiError {
+  resp, err := f.facebookClient.Get(f.options.BaseURL + "/" + profileID + "/permissions?access_token=" + f.clientAccessToken)
+  if err != nil {
+    log.Fatal(err)
+    return conf.ErrNoProfile
+  }
+  defer resp.Body.Close()
+
+  body, _ := ioutil.ReadAll(resp.Body)
+
+  if resp.StatusCode >= 400 {
+    return parseError(resp.StatusCode, body)
+  }
+  var permissions = &FBPermissionsResponse{}
+  if err := json.Unmarshal(body, &permissions); err != nil {
+    log.Fatal(err)
+    return conf.NewApiError(err)
+  }
+  for _, p := range permissions.data {
+    if p.permission == "user_friends" && p.status == "granted" {
+      return nil
+    }
+  }
+  return conf.ErrFriendsNoPermissions
 }
 
 // Parse facebook specific error.
