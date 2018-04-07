@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {isValidURL} from '../common/utils';
 import {AuthService} from "../services/auth.service";
+import {CookieService} from "ngx-cookie-service";
 
 @Component({
   selector: 'chat-oauth-callback',
@@ -17,7 +18,8 @@ export class OauthAuthorizedComponent implements OnInit {
 
   constructor(private auth: AuthService,
               private route: ActivatedRoute,
-              private router: Router) {
+              private router: Router,
+              private cookie: CookieService) {
   }
 
   ngOnInit() {
@@ -27,7 +29,7 @@ export class OauthAuthorizedComponent implements OnInit {
     this.errors = [];
     const params = this.route.snapshot.queryParams;
     const externalState = (<any>window).decodeURIComponent(params.state);
-    const localState = sessionStorage.getItem('oauth_state');
+    const localState = this.cookie.get('oauth_state');
     let state: any;
     if (!localState || externalState !== localState) {
       console.error(`Original state ${localState} is not equal to provided ${externalState}`);
@@ -45,6 +47,7 @@ export class OauthAuthorizedComponent implements OnInit {
       this.errors.push(params.error);
     } else {
       if (state) {
+        this.cookie.delete('oauth_state');
         state.accessCode = params.code;
         state.error = this.errors.length > 0 ? this.errors[0] : undefined;
         const redirectUrl = state.oauthRedirectUrl;
