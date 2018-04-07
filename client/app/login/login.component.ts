@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
     let authState = null;
     if (state) {
       try {
-        authState = JSON.parse(atob(state));
+        authState = JSON.parse((<any>window).decodeURIComponent(atob(state)));
       } catch (error) {
       }
     }
@@ -68,11 +68,11 @@ export class LoginComponent implements OnInit {
     const {authUri, clientId, scope} = conf;
     const redirectUri = this.oauthConfig.redirectUri;
 
-    const state = btoa(JSON.stringify({
+    const state = (<any>window).encodeURIComponent(btoa(JSON.stringify({
       randomString: Math.random().toString(36).slice(2),
       oauthRedirectUrl: `${this.oauthConfig.oAuthRedirectUriBase}/${provider}`,
       isPopup: this.isPopup
-    }));
+    })));
     sessionStorage.setItem('oauth_state', state);
     return `${authUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}&response_type=code&display=popup`;
   }

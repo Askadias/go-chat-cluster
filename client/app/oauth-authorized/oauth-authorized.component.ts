@@ -33,7 +33,7 @@ export class OauthAuthorizedComponent implements OnInit {
       this.errors.push(OAUTH_INVALID_STATE_ERROR);
     } else {
       try {
-        state = JSON.parse(atob(externalState));
+        state = JSON.parse((<any>window).decodeURIComponent(atob(externalState)));
       } catch (err) {
         this.errors.push(OAUTH_INVALID_STATE_ERROR);
       }
@@ -53,7 +53,7 @@ export class OauthAuthorizedComponent implements OnInit {
           } else {
             if (state.isPopup) {
               this.isPopup = true;
-              const encodedState = btoa(JSON.stringify(state));
+              const encodedState = (<any>window).encodeURIComponent(btoa(JSON.stringify(state)));
               window.opener.location = `${state.oauthRedirectUrl}?extLoginState=${encodedState}`;
               window.close();
             }
