@@ -27,14 +27,14 @@ export class OauthAuthorizedComponent implements OnInit {
     this.errors = [];
     const params = this.route.snapshot.queryParams;
     const externalState = (<any>window).decodeURIComponent(params.state);
-    const localState = localStorage.getItem('oauth_state');
+    const localState = sessionStorage.getItem('oauth_state');
     let state: any;
     if (!localState || externalState !== localState) {
-      console.log(`Original state ${localState} is not equal to provided ${externalState}`);
+      console.error(`Original state ${localState} is not equal to provided ${externalState}`);
       this.errors.push(OAUTH_INVALID_STATE_ERROR);
     } else {
       try {
-        console.log(`Failed to parse provided state: ${externalState}`);
+        console.error(`Failed to parse provided state: ${externalState}`);
         state = JSON.parse(atob(externalState));
       } catch (err) {
         this.errors.push(OAUTH_INVALID_STATE_ERROR);

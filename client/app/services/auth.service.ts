@@ -108,7 +108,7 @@ export class AuthService {
       oauthRedirectUrl: redirectBack ? window.location.href : `${env.oauth.oAuthRedirectUriBase}/${provider}`,
       isPopup: isPopup
     }));
-    localStorage.setItem('oauth_state', rawState);
+    sessionStorage.setItem('oauth_state', rawState);
     const state = (<any>window).encodeURIComponent(rawState);
     var resultUrl = `${authUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&scope=${scope}&response_type=code&display=popup`;
     if (force) {
