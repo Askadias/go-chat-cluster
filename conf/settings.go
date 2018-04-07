@@ -3,6 +3,8 @@ package conf
 import (
   "time"
   "github.com/kelseyhightower/envconfig"
+  "strconv"
+  "os"
 )
 
 var System SystemConf
@@ -100,7 +102,11 @@ type MongoConf struct {
 }
 
 func init() {
-  System.Port = 3000
+  if port, err := strconv.ParseInt(os.Getenv("PORT"), 10, 0); err != nil || port == 0 {
+    System.Port = 3000
+  } else {
+    System.Port = int(port)
+  }
   System.SessionSecret = "E4Nkf1ZZ5vRwB5CgvYMDzb12pQ7CU1Tg"
   System.JWTSecret = "BfqQHegw8cvC22unqNTiIuQVm89jSPLj"
   System.JWTUserPropName = "user"
