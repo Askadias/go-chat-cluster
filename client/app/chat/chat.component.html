@@ -34,10 +34,13 @@
         </button>
       </chat-person>
     </div>
-    <div *ngIf="!hasFriendsPermissions">
+    <div *ngIf="loadingFriends">
+      <mat-spinner class="loading-friends"></mat-spinner>
+    </div>
+    <div *ngIf="!hasFriendsPermissions && !loadingFriends">
       <button mat-raised-button fxFlex
               (click)="loginWith('facebook')"
-              class="facebookBtn">
+              class="facebook-btn">
         <mat-icon svgIcon="facebook" class="fb-icon"></mat-icon>
         Allow friends access to import them from Facebook
       </button>
