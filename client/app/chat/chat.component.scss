@@ -52,13 +52,12 @@
 .person-control-grp-btn {
   width: 36px;
   height: 36px;
-  background: linear-gradient(to left, #2a2a2a 80%, transparent 100%);
 }
 
 .person-control-btn {
   width: 36px;
   height: 36px;
-  background: linear-gradient(to left, #121212 80%, transparent 100%);
+  //background: linear-gradient(to left, #121212 80%, transparent 100%);
 }
 
 .friends-filter-input {
@@ -81,6 +80,7 @@
   width: 100%;
   opacity: 0.5;
   margin: 5px 0;
+  overflow: hidden;
   &.active {
     border-left: transparent;
     background-color: #2a2a2a;
@@ -88,6 +88,13 @@
     border-bottom-right-radius: 0;
     right: -1px;
     opacity: 1;
+    .chat-person {
+      .person {
+        &:hover {
+          background-color: white;
+        }
+      }
+    }
   }
   .chat-group-overlay-btn {
     transition: all 0.2s ease-in;

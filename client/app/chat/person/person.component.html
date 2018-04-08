@@ -3,8 +3,6 @@
      [class.active]="active"
      [class.compact]="compact"
      fxLayout="row"
-     (mouseover)="showPersonControls = true"
-     (mouseleave)="showPersonControls = false"
      fxLayoutAlign="space-between center">
   <a (click)="click.emit($event)"
      class="person-link"
@@ -21,13 +19,12 @@
     </div>
     <div *ngIf="!compact"
          class="person-name"
-         [class.highlight]="showPersonControls"
           [@fadeShiftAnimation]>
       {{ person.name }}
     </div>
   </a>
   <div class="person-controls"
-       *ngIf="!compact && showPersonControls"
+       *ngIf="!compact"
        [@fadeAnimation]
        fxLayout="row"
        fxLayoutAlign="end center"

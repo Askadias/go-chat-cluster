@@ -17,5 +17,4 @@ export class PersonComponent {
   @Input() active = false;
   @Input() compact = false;
   @Output() click: EventEmitter<any> = new EventEmitter<any>();
-  @Input() showPersonControls = false;
 }

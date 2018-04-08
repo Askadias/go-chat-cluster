@@ -1,4 +1,5 @@
 @import "../../../styles";
+
 $timings: ease-out;
 
 .person {
@@ -19,19 +20,11 @@ $timings: ease-out;
     text-align: center;
   }
 
-
-  //.person-name {
-  //  position: absolute;
-  //  top: 0;
-  //  right: 0;
-  //  bottom: 0;
-  //  left: 60px;
-  //}
   .person-link {
     position: relative;
     text-decoration: none;
     color: #969696;
-    transition: all .2s $timings;
+    transition: all .0s $timings;
 
     .avatar-container {
       margin: 3px;
@@ -60,9 +53,6 @@ $timings: ease-out;
       min-width: 238px;
       &.extinguished {
         opacity: 0.2;
-      }
-      &.highlight {
-        color: white;
       }
     }
   }
@@ -94,11 +84,15 @@ $timings: ease-out;
     }
   }
 
-  .person-link:hover {
-    color: $accent-color;
-    .avatar-container .mask {
-      background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
-      transform: translate3d(10%, 10%, 0) rotate3d(0, 0, 1, 90deg);
+  &:hover {
+    background-color: $chat-grey-4;
+    .person-link {
+
+      color: $accent-color;
+      .avatar-container .mask {
+        background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+        transform: translate3d(10%, 10%, 0) rotate3d(0, 0, 1, 90deg);
+      }
     }
   }
 }

@@ -12,7 +12,7 @@
         <a (click)="switchToChat(chat)" *ngIf="!isActiveChat(chat)" class="chat-group-overlay-btn"></a>
         <chat-person *ngFor="let memberId of chat.room.members | skipOwnFilter:profile.id"
                      (click)="!isActiveChat(chat) ? switchToChat(chat) : chatWith(memberId)"
-                     [person]="chat.getUser(memberId)">
+                     [person]="chat.getUser(memberId)" class="chat-person">
           <button class="flat-button person-control-grp-btn"
                   (click)="$event.stopPropagation(); removeFromChat(chat, memberId)"
                   *ngIf="chat.amIOwner()">
