@@ -10,6 +10,7 @@ import (
   "github.com/Askadias/go-chat-cluster/models"
 )
 
+// Returns list of authenticated user friends
 func GetFriends(req *http.Request, render render.Render, friends services.Friends) {
   tkn := req.Context().Value("user").(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
@@ -25,6 +26,7 @@ func GetFriends(req *http.Request, render render.Render, friends services.Friend
   }
 }
 
+// Returns error response if application doesn't have permission to fetch user friends
 func HasFriendsPermissions(req *http.Request, res http.ResponseWriter, render render.Render, friends services.Friends) {
   tkn := req.Context().Value("user").(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
@@ -40,6 +42,7 @@ func HasFriendsPermissions(req *http.Request, res http.ResponseWriter, render re
   }
 }
 
+// Returns user by ID
 func GetUser(params martini.Params, render render.Render, account services.Account) {
   userID := params["id"]
   if user, err := account.GetUser(userID); err != nil {
@@ -49,6 +52,7 @@ func GetUser(params martini.Params, render render.Render, account services.Accou
   }
 }
 
+// Batch request to fetch users by IDs
 func GetUsers(req *http.Request, render render.Render, account services.Account) {
   qs := req.URL.Query()
   userIDs := qs["userId"]

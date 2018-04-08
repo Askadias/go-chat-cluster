@@ -83,6 +83,8 @@ type RedisConf struct {
   // Close connections older than this duration. If the value is zero, then
   // the pool does not close connections based on age.
   MaxConnLifetime time.Duration
+  // Cache expiration duration
+  CacheTTL time.Duration `default:"5m"`
 }
 
 var Mongo MongoConf

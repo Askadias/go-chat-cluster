@@ -6,17 +6,17 @@ import (
   "github.com/Askadias/go-chat-cluster/conf"
 )
 
-type RedisOptions struct {
+type RedisBusOptions struct {
   RedisPool *redis.Pool
 }
 
 type RedisBus struct {
-  options    RedisOptions
+  options    RedisBusOptions
   pubSubConn *redis.PubSubConn
   receive    chan map[string][]byte
 }
 
-func NewRedisBus(options RedisOptions) *RedisBus {
+func NewRedisBus(options RedisBusOptions) *RedisBus {
   bus := &RedisBus{
     options: options,
     receive: make(chan map[string][]byte),

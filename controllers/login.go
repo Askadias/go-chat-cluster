@@ -16,6 +16,7 @@ type UserClaims struct {
   jwt.StandardClaims
 }
 
+// Retrieves user info using OAuth flow and returns encrypted JWT with username and id
 func LoginWithProvider(extAuth models.ExtAuthCredentials, render render.Render, oauth services.OAuth, account services.Account) {
   accessToken, err := oauth.ExchangeCodeToToken(extAuth.Code)
   if err != nil {

@@ -27,8 +27,13 @@ var jwtOptions = auth.Options{
   UserProperty:  conf.System.JWTUserPropName,
 }
 
-var redisOptions = db.RedisOptions{
-  RedisPool: db.NewRedisPool(conf.Redis),
+var redisPool = db.NewRedisPool(conf.Redis)
+var redisBusOptions = db.RedisBusOptions{
+  RedisPool: redisPool,
+}
+var redisCacheOptions = db.RedisCacheOptions{
+  RedisPool: redisPool,
+  CacheTTL: conf.Redis.CacheTTL,
 }
 
 func main() {
@@ -60,6 +65,7 @@ func main() {
   jwtMiddleware := auth.NewJwtMiddleware(jwtOptions)
 
   // Injecting Services
+  cache := db.NewRedisCache(redisCacheOptions)
   facebook := services.NewFacebook(conf.Facebook)
   chat := db.NewMongoChat(conf.Mongo, conf.Chat)
   m.MapTo(facebook, (*services.OAuth)(nil))
@@ -67,9 +73,11 @@ func main() {
   m.MapTo(facebook, (*services.Friends)(nil))
   m.MapTo(chat, (*db.Chat)(nil))
   m.MapTo(chat, (*db.ChatLog)(nil))
+  m.MapTo(chat, (*db.ChatLog)(nil))
+  m.MapTo(cache, (*db.RoomCache)(nil))
 
   // WebSocket Manager
-  bus := db.NewRedisBus(redisOptions)
+  bus := db.NewRedisBus(redisBusOptions)
   connectionManager := services.NewConnectionManager(bus, chat, conf.Socket)
   m.Map(connectionManager)
 

@@ -31,9 +31,8 @@ func ConnectToChat(
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
-
     if conn, err := upgrader.Upgrade(res, req, nil); err != nil {
-      http.NotFound(res, req)
+      render.JSON(http.StatusInternalServerError, conf.NewApiError(err))
     } else {
       conn.SetReadLimit(conf.Socket.MaxMessageSize)
       conn.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
@@ -107,13 +106,19 @@ func GetRoom(
   req *http.Request,
   render render.Render,
   chat db.Chat,
+  roomCache db.RoomCache,
 ) {
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
     roomID := params["id"]
-    if room, err := chat.GetRoom(profileID, roomID); err != nil {
-      render.JSON(err.HttpCode, err)
+    if room, err := roomCache.GetRoom(roomID); err != nil {
+      if room, err := chat.GetRoom(profileID, roomID); err != nil {
+        render.JSON(err.HttpCode, err)
+      } else {
+        render.JSON(http.StatusOK, room)
+        roomCache.PutRoom(roomID, room)
+      }
     } else {
       render.JSON(http.StatusOK, room)
     }
@@ -130,6 +135,7 @@ func DeleteRoom(
   render render.Render,
   chat db.Chat,
   manager *services.ConnectionManager,
+  roomCache db.RoomCache,
 ) {
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
@@ -139,6 +145,7 @@ func DeleteRoom(
     if room, err := chat.DeleteRoom(profileID, roomID); err != nil {
       render.JSON(err.HttpCode, err)
     } else {
+      roomCache.EvictRoom(roomID)
       if err := manager.Broadcast(&models.Message{Type: "update", Room: roomID}, room.Members); err != nil {
         render.JSON(err.HttpCode, err)
       } else {
@@ -159,6 +166,7 @@ func AddRoomMember(
   chat db.Chat,
   friends services.Friends,
   manager *services.ConnectionManager,
+  roomCache db.RoomCache,
 ) {
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
@@ -178,6 +186,7 @@ func AddRoomMember(
     if room, err := chat.AddRoomMember(profileID, roomID, memberID); err != nil {
       render.JSON(err.HttpCode, err)
     } else {
+      roomCache.PutRoom(roomID, room)
       if err := manager.Broadcast(&models.Message{Type: "update", Room: roomID}, room.Members); err != nil {
         render.JSON(err.HttpCode, err)
       } else {
@@ -197,6 +206,7 @@ func RemoveRoomMember(
   render render.Render,
   chat db.Chat,
   manager *services.ConnectionManager,
+  roomCache db.RoomCache,
 ) {
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
@@ -207,6 +217,7 @@ func RemoveRoomMember(
     if room, err := chat.RemoveRoomMember(profileID, roomID, memberID); err != nil {
       render.JSON(err.HttpCode, err)
     } else {
+      roomCache.PutRoom(roomID, room)
       if err := manager.Broadcast(&models.Message{Type: "update", Room: roomID}, append(room.Members, memberID)); err != nil {
         render.JSON(err.HttpCode, err)
       } else {
@@ -227,6 +238,7 @@ func SendMessage(
   chat db.Chat,
   chatLog db.ChatLog,
   manager *services.ConnectionManager,
+  roomCache db.RoomCache,
 ) {
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
@@ -238,18 +250,27 @@ func SendMessage(
     if newMessage, err := chatLog.AddMessage(message); err != nil {
       render.JSON(err.HttpCode, err)
     } else {
-      if room, err := chat.GetRoom(profileID, roomID); err != nil {
-        render.JSON(err.HttpCode, err)
-      } else {
-        if err := manager.Broadcast(newMessage, room.Members); err != nil {
+      if room, err := roomCache.GetRoom(roomID); err != nil {
+        if room, err := chat.GetRoom(profileID, roomID); err != nil {
           render.JSON(err.HttpCode, err)
         } else {
-          render.JSON(http.StatusOK, newMessage)
+          broadcast(newMessage, room.Members, manager, render)
+          roomCache.PutRoom(roomID, room)
         }
+      } else {
+        broadcast(newMessage, room.Members, manager, render)
       }
     }
   } else {
     render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
+  }
+}
+
+func broadcast(message *models.Message, auditory []string, manager *services.ConnectionManager, render render.Render) {
+  if err := manager.Broadcast(message, auditory); err != nil {
+    render.JSON(err.HttpCode, err)
+  } else {
+    render.JSON(http.StatusOK, message)
   }
 }
 
