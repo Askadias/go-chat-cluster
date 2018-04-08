@@ -34,12 +34,10 @@ type Facebook struct {
   clientAccessToken string
 }
 
-func NewFacebook(options conf.FacebookConf) (f *Facebook) {
+func NewFacebook(options conf.FacebookConf, httpClient *http.Client) (f *Facebook) {
   f = &Facebook{
     options: options,
-    facebookClient: &http.Client{
-      Timeout: options.Timeout,
-    },
+    facebookClient: httpClient,
   }
   if err := f.setupClientToken(); err != nil {
     panic(err)
@@ -53,17 +51,20 @@ func (f *Facebook) setupClientToken() error {
     "&client_id=" + f.options.ClientID +
     "&client_secret=" + f.options.ClientSecret)
   if err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return conf.NewApiError(err)
   }
 
   defer resp.Body.Close()
 
   body, _ := ioutil.ReadAll(resp.Body)
+  if resp.StatusCode >= 400 {
+    return parseError(resp.StatusCode, body)
+  }
   token := &models.Token{}
 
   if err := json.Unmarshal(body, token); err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return conf.NewApiError(err)
   }
   f.clientAccessToken = token.AccessToken
@@ -78,7 +79,7 @@ func (f *Facebook) ExchangeCodeToToken(accessCode string) (string, *conf.ApiErro
     "&client_secret=" + f.options.ClientSecret +
     "&code=" + accessCode)
   if err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return "", conf.ErrAccountNotLoggedIn
   }
 
@@ -90,7 +91,7 @@ func (f *Facebook) ExchangeCodeToToken(accessCode string) (string, *conf.ApiErro
   }
   token := &models.Token{}
   if err := json.Unmarshal(body, token); err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return "", conf.NewApiError(err)
   }
   return token.AccessToken, nil
@@ -102,7 +103,7 @@ func (f *Facebook) GetProfile(accessToken string) (*models.User, *conf.ApiError)
   req.Header.Set("Authorization", "Bearer "+accessToken)
   resp, err := f.facebookClient.Do(req)
   if err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return nil, conf.ErrNoProfile
   }
 
@@ -115,7 +116,7 @@ func (f *Facebook) GetProfile(accessToken string) (*models.User, *conf.ApiError)
   }
   user := &models.User{}
   if err := json.Unmarshal(body, user); err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return nil, conf.NewApiError(err)
   }
   user.AvatarURL = f.options.BaseURL + "/" + user.ID + "/picture"
@@ -126,7 +127,7 @@ func (f *Facebook) GetProfile(accessToken string) (*models.User, *conf.ApiError)
 func (f *Facebook) GetUser(profileID string) (*models.User, *conf.ApiError) {
   resp, err := f.facebookClient.Get(f.options.BaseURL + "/" + profileID + "?access_token=" + f.clientAccessToken)
   if err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return nil, conf.ErrNoProfile
   }
 
@@ -139,7 +140,7 @@ func (f *Facebook) GetUser(profileID string) (*models.User, *conf.ApiError) {
   }
   user := &models.User{}
   if err := json.Unmarshal(body, user); err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return nil, conf.NewApiError(err)
   }
   user.AvatarURL = f.options.BaseURL + "/" + user.ID + "/picture"
@@ -150,7 +151,7 @@ func (f *Facebook) GetUser(profileID string) (*models.User, *conf.ApiError) {
 func (f *Facebook) GetFriends(profileID string) ([]models.User, *conf.ApiError) {
   resp, err := f.facebookClient.Get(f.options.BaseURL + "/" + profileID + "/friends?access_token=" + f.clientAccessToken)
   if err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return nil, conf.ErrNoProfile
   }
 
@@ -163,7 +164,7 @@ func (f *Facebook) GetFriends(profileID string) ([]models.User, *conf.ApiError) 
   }
   var friends = &models.UserList{}
   if err := json.Unmarshal(body, &friends); err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return nil, conf.NewApiError(err)
   }
   for i := range friends.Data {
@@ -175,7 +176,7 @@ func (f *Facebook) GetFriends(profileID string) ([]models.User, *conf.ApiError) 
 func (f *Facebook) HasFriendsPermissions(profileID string) *conf.ApiError {
   resp, err := f.facebookClient.Get(f.options.BaseURL + "/" + profileID + "/permissions?access_token=" + f.clientAccessToken)
   if err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return conf.ErrNoProfile
   }
   defer resp.Body.Close()
@@ -187,7 +188,7 @@ func (f *Facebook) HasFriendsPermissions(profileID string) *conf.ApiError {
   }
   var permissions = &FBPermissionsResponse{}
   if err := json.Unmarshal(body, &permissions); err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return conf.NewApiError(err)
   }
   for _, p := range permissions.data {
@@ -201,8 +202,9 @@ func (f *Facebook) HasFriendsPermissions(profileID string) *conf.ApiError {
 // Parse facebook specific error.
 func parseError(statusCode int, body []byte) *conf.ApiError {
   fbError := &FBError{}
+  log.Println("Facebook returned error response", string(body))
   if err := json.Unmarshal(body, fbError); err != nil {
-    log.Fatal(err)
+    log.Println(err)
     return conf.NewApiError(err)
   }
   fbError.Error.HttpCode = statusCode

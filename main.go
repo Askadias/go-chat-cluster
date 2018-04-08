@@ -66,7 +66,9 @@ func main() {
 
   // Injecting Services
   cache := db.NewRedisCache(redisCacheOptions)
-  facebook := services.NewFacebook(conf.Facebook)
+  facebook := services.NewFacebook(conf.Facebook, &http.Client{
+    Timeout: conf.Facebook.Timeout,
+  })
   chat := db.NewMongoChat(conf.Mongo, conf.Chat)
   m.MapTo(facebook, (*services.OAuth)(nil))
   m.MapTo(facebook, (*services.Account)(nil))

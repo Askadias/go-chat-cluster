@@ -46,7 +46,7 @@
       <button class="flat-button chat-emoji-btn" type="button" (click)="toggleEmojiPicker()">
         <mat-icon class="md-24">tag_faces</mat-icon>
       </button>
-      <div class="emoji-picker" *ngIf="emojiPickerOpened">
+      <div class="emoji-picker" [class.show]="emojiPickerOpened">
         <div class="emoji-close-overlay" (click)="emojiPickerOpened = false"></div>
         <emoji-mart title="Pick your emoji…"
                     perLine="7"
