@@ -146,11 +146,11 @@ func DeleteRoom(
       render.JSON(err.HttpCode, err)
     } else {
       roomCache.EvictRoom(roomID)
-      if err := manager.Broadcast(&models.Message{Type: "update", Room: roomID}, room.Members); err != nil {
-        render.JSON(err.HttpCode, err)
-      } else {
-        res.WriteHeader(http.StatusNoContent)
+      manager.Broadcast <- &services.BroadcastPackage{
+        Message:  &models.Message{Type: "update", Room: roomID},
+        Auditory: room.Members,
       }
+      res.WriteHeader(http.StatusNoContent)
     }
   } else {
     render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
@@ -187,11 +187,11 @@ func AddRoomMember(
       render.JSON(err.HttpCode, err)
     } else {
       roomCache.PutRoom(roomID, room)
-      if err := manager.Broadcast(&models.Message{Type: "update", Room: roomID}, room.Members); err != nil {
-        render.JSON(err.HttpCode, err)
-      } else {
-        res.WriteHeader(http.StatusOK)
+      manager.Broadcast <- &services.BroadcastPackage{
+        Message:  &models.Message{Type: "update", Room: roomID},
+        Auditory: room.Members,
       }
+      res.WriteHeader(http.StatusOK)
     }
   } else {
     render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
@@ -218,11 +218,11 @@ func RemoveRoomMember(
       render.JSON(err.HttpCode, err)
     } else {
       roomCache.PutRoom(roomID, room)
-      if err := manager.Broadcast(&models.Message{Type: "update", Room: roomID}, append(room.Members, memberID)); err != nil {
-        render.JSON(err.HttpCode, err)
-      } else {
-        res.WriteHeader(http.StatusNoContent)
+      manager.Broadcast <- &services.BroadcastPackage{
+        Message:  &models.Message{Type: "update", Room: roomID},
+        Auditory: append(room.Members, memberID),
       }
+      res.WriteHeader(http.StatusNoContent)
     }
   } else {
     render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
@@ -267,11 +267,8 @@ func SendMessage(
 }
 
 func broadcast(message *models.Message, auditory []string, manager *services.ConnectionManager, render render.Render) {
-  if err := manager.Broadcast(message, auditory); err != nil {
-    render.JSON(err.HttpCode, err)
-  } else {
-    render.JSON(http.StatusOK, message)
-  }
+  manager.Broadcast <- &services.BroadcastPackage{Message: message, Auditory: auditory}
+  render.JSON(http.StatusOK, message)
 }
 
 // Returns chat log of a given room

@@ -39,6 +39,9 @@ type SocketConf struct {
   // or received.
   ReadBufferSize  int `default:"1024",split_words:"true"`
   WriteBufferSize int `default:"1024",split_words:"true"`
+  // Goroutines pool size for receiving and broadcasting messages
+  SendersPoolSize   int `default:"128",split_words:"true"`
+  ReceiversPoolSize int `default:"128",split_words:"true"`
 }
 
 var Facebook FacebookConf
