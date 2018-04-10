@@ -1,4 +1,5 @@
 export class Message {
+  id?: string;
   room: string;
   from: string;
   timestamp: number;

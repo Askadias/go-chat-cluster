@@ -60,6 +60,12 @@
         bottom: 0;
         right: 0;
         max-height: 100%;
+        .loading-zone {
+          height: 10px;
+        }
+        .loading-messages {
+          margin: auto;
+        }
         .chat-message {
           margin: 0;
           padding: 5px 0 0 0;

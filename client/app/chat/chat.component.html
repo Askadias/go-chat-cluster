@@ -9,6 +9,9 @@
     </div>
     <div class="chat-groups">
       <div class="chat-group" *ngFor="let chat of rooms" [class.active]="isActiveChat(chat)" fxLayout="column">
+        <div *ngIf="chat.loading">
+          <mat-spinner class="loading-members"></mat-spinner>
+        </div>
         <a (click)="switchToChat(chat)" *ngIf="!isActiveChat(chat)" class="chat-group-overlay-btn"></a>
         <chat-person *ngFor="let memberId of chat.room.members | skipOwnFilter:profile.id"
                      (click)="!isActiveChat(chat) ? switchToChat(chat) : chatWith(memberId)"

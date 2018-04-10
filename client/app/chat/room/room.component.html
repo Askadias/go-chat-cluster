@@ -10,8 +10,12 @@
   <div class="room-bg"></div>
   <div class="chat-log-container">
     <div class="chat-log">
-      <div class="chat-messages" #chatLogElement>
-        <div *ngFor="let message of _room.messages; let i = index"
+      <div class="chat-messages" #chatLogElement (scroll)="loadHistory()">
+        <div class="loading-zone"></div>
+        <div *ngIf="loading">
+          <mat-spinner class="loading-messages"></mat-spinner>
+        </div>
+        <div *ngFor="let message of _room.messages; trackBy: trackByMessageId; let i = index"
              class="chat-message"
              [class.mine]="message.from == _room.me.id"
              [class.join]="isNearestMessage(message, i)"

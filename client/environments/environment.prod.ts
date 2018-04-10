@@ -13,6 +13,7 @@ export const environment = {
     maxSubscriptionRetries: 100
   },
   chat: {
+    messagesLimit: 50,
     closeMessagesRangeSec: 60
   }
 };

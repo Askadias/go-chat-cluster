@@ -4,6 +4,7 @@ import {Room} from "./room";
 import {AuthService} from "../services/auth.service";
 import {ChatService} from "../services/chat.service";
 import "rxjs/add/operator/mergeMap";
+import {EventEmitter} from "@angular/core";
 
 export class RoomContainer {
   messages: Message[] = [];
@@ -12,6 +13,8 @@ export class RoomContainer {
   errors: string[] = [];
   newMessage: string;
   usersToFetch: string[] = [];
+  onMessageDelivered: EventEmitter<Message> = new EventEmitter<Message>();
+  onMessageReceived: EventEmitter<Message> = new EventEmitter<Message>();
 
   constructor(public me: User,
               public room: Room,
@@ -24,16 +27,6 @@ export class RoomContainer {
         this.loading = false;
         if (users) {
           users.forEach(user => this.accounts.set(user.id, user))
-        }
-      }, (error) => {
-        this.loading = false;
-        this.errors = [error.message];
-      }
-    );
-    chat.getChatLog(this.room.id, Date.now(), 100).subscribe((messages: Message[]) => {
-        this.loading = false;
-        if (messages) {
-          this.messages = messages
         }
       }, (error) => {
         this.loading = false;
@@ -56,8 +49,13 @@ export class RoomContainer {
     })
   }
 
-  onMessageReceive(message: Message) {
+  onMessage(message: Message) {
     this.messages.push(message);
+    if (message.from == this.me.id) {
+      this.onMessageDelivered.emit(message);
+    } else {
+      this.onMessageReceived.emit(message);
+    }
   }
 
   amIOwner() {
@@ -75,10 +73,22 @@ export class RoomContainer {
   fetchUsers() {
     if (this.usersToFetch.length > 0) {
       this.auth.getUsers(this.usersToFetch).subscribe((users) => {
-        this.usersToFetch = [];
         if (users && users.length > 0) {
-          users.forEach(user => this.accounts.set(user.id, user));
+          users.forEach(user => {
+            this.accounts.set(user.id, user);
+            this.usersToFetch.slice(this.usersToFetch.indexOf(user.id), 1);
+          });
         }
+        // populate unknown users
+        this.usersToFetch.forEach(unknownUserId => {
+          this.accounts.set(unknownUserId, {
+            id: unknownUserId,
+            name: 'Unknown',
+            online: false,
+            avatarUrl: null
+          })
+        });
+        this.usersToFetch = [];
         setTimeout(this.fetchUsers, 60000);
       })
     }

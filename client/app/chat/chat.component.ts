@@ -10,6 +10,7 @@ import {Message} from "../domain/message";
 import {range} from 'rxjs/observable/range'
 import {zip} from 'rxjs/observable/zip'
 import {timer} from 'rxjs/observable/timer'
+import {exponentialBackOff} from "../common/utils";
 
 @Component({
   selector: 'chat-component',
@@ -45,7 +46,7 @@ export class ChatComponent implements OnInit {
         this.loadingFriends = false;
         this.friends = friends;
         if (!friends || friends.length == 0) {
-          this.chat.getRooms().subscribe(
+          this.auth.hasFriendsPermissions().subscribe(
             () => {
               this.hasFriendsPermissions = false;
             }, (error) => {
@@ -76,16 +77,7 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.chat.getSocket().retryWhen(function (errors) {
-      return zip(
-        range(1, env.socket.maxSubscriptionRetries), errors, function (i, e) {
-          return i
-        })
-        .flatMap(function (i) {
-          console.log("delay retry by " + i + " second(s)");
-          return timer(i * 1000);
-        });
-    }).subscribe((message: Message) => {
+    this.chat.getSocket().retryWhen(exponentialBackOff).subscribe((message: Message) => {
       if (message.room) {
         if (message.type === 'update') {
           this.loadingRooms = false;
@@ -118,7 +110,7 @@ export class ChatComponent implements OnInit {
             roomContainer.room.id === message.room
           );
           if (targetChat) {
-            targetChat.onMessageReceive(message)
+            targetChat.onMessage(message)
           } else {
             this.loadingRooms = false;
             this.chat.getRoom(message.room).subscribe(

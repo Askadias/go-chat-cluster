@@ -15,7 +15,7 @@ export class ChatService {
   }
 
   getChatLog(roomId: string, from: number, limit: number): Observable<Message[]> {
-    return this.http.get<Message[]>(`/api/rooms/${roomId}/log?from${from}&limit=${limit}`);
+    return this.http.get<Message[]>(`/api/rooms/${roomId}/log?from=${from}&limit=${limit}`);
   }
 
   send(message: Message) {

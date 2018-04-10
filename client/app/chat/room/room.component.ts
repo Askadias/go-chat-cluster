@@ -1,16 +1,17 @@
-import {AfterViewChecked, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Message} from '../../domain/message';
 import {User} from '../../domain/user';
 import {RoomContainer} from "../../domain/room-container";
 import {environment as env} from "../../../environments/environment";
 import {EmojiEvent} from "@ctrl/ngx-emoji-mart/ngx-emoji";
+import {ChatService} from "../../services/chat.service";
 
 @Component({
   selector: 'chat-room',
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss']
 })
-export class RoomComponent implements OnInit, AfterViewChecked {
+export class RoomComponent implements OnInit {
 
   @Input() className = '';
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
@@ -20,45 +21,86 @@ export class RoomComponent implements OnInit, AfterViewChecked {
 
   _room: RoomContainer;
   members: User[];
-  messages: Message[];
   me: User;
   loading = false;
+  sending = false;
   errors: string[] = [];
   emojiPickerOpened = false;
+  initialized = false;
 
-  constructor() {
+  constructor(private chat: ChatService) {
   }
 
   @Input()
   set room(room: RoomContainer) {
     this._room = room;
-    setTimeout(() => {
-      const native = this.chatLogContainer.nativeElement;
-      native.scrollTop = native.scrollHeight;
+    this.initialized = false;
+    this._room.messages = [];
+    this.loadMessages();
+    this._room.onMessageDelivered.subscribe(() => {
+      setTimeout(() => {
+        const native = this.chatLogContainer.nativeElement;
+        native.scrollTop = native.scrollHeight;
+      });
     });
+    this._room.onMessageReceived.subscribe(() => {
+      setTimeout(() => {
+        const native = this.chatLogContainer.nativeElement;
+        if (native.scrollHeight - (native.scrollTop + native.clientHeight) < 100) {
+          native.scrollTop = native.scrollHeight;
+        }
+      });
+    })
+  }
+
+  loadMessages() {
+    let from = Date.now();
+    if (this._room.messages.length > 1) {
+      from = this._room.messages[0].timestamp;
+    }
+    this.loading = true;
+    this.chat.getChatLog(this._room.room.id, from, env.chat.messagesLimit).subscribe((messages: Message[]) => {
+        this.loading = false;
+        if (messages) {
+          messages.reverse().push(...this._room.messages);
+          this._room.messages = messages;
+          if (!this.initialized) { // scroll to the last message on chat opening
+            setTimeout(() => {
+              const native = this.chatLogContainer.nativeElement;
+              native.scrollTop = native.scrollHeight;
+            });
+          } else {
+            setTimeout(() => {
+              const native = this.chatLogContainer.nativeElement;
+              native.scrollTop = 10;
+            });
+          }
+        }
+        this.initialized = true;
+      }, (error) => {
+        this.loading = false;
+        this.errors = [error.message];
+        this.initialized = true;
+      }
+    );
   }
 
   ngOnInit() {
   }
 
-  ngAfterViewChecked() {
-    this.scroll();
-  }
-
   sendMessage() {
     if (this._room.newMessage !== '') {
-      this.loading = true;
+      this.sending = true;
       this.errors = [];
       this._room.chat.send(new Message(this._room.room.id, this._room.me.id, this._room.newMessage, Date.now()))
         .subscribe(() => {
-            this.loading = false;
+            this.sending = false;
           },
           (error) => {
-            this.loading = false;
+            this.sending = false;
             this.errors = [error.message];
           });
       this._room.newMessage = '';
-      this.scrollToBottom();
     }
   }
 
@@ -82,18 +124,13 @@ export class RoomComponent implements OnInit, AfterViewChecked {
       && this._room.messages[index + 1].timestamp - this._room.messages[index].timestamp < env.chat.closeMessagesRangeSec;
   }
 
-  scroll(): void {
-    const native = this.chatLogContainer.nativeElement;
-    if (native.scrollHeight - (native.scrollTop + native.clientHeight) < 100) {
-      this.scrollToBottom();
-    }
-  }
-
-  scrollToBottom(): void {
-    try {
+  loadHistory() {
+    if (this.initialized) {
       const native = this.chatLogContainer.nativeElement;
-      native.scrollTop = native.scrollHeight;
-    } catch (err) {
+
+      if (native.scrollTop < 1) {
+        this.loadMessages()
+      }
     }
   }
 
@@ -105,5 +142,9 @@ export class RoomComponent implements OnInit, AfterViewChecked {
     if (event) {
       this._room.newMessage += event.emoji.native
     }
+  }
+
+  trackByMessageId(index: number, message: Message): string {
+    return message.id;
   }
 }

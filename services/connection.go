@@ -4,7 +4,6 @@ import (
   "github.com/gorilla/websocket"
   "time"
   "github.com/Askadias/go-chat-cluster/conf"
-  "log"
 )
 
 type Connection struct {
@@ -21,13 +20,11 @@ func NewConnection(userID string, socket *websocket.Conn) *Connection {
 }
 
 func (c *Connection) Send(message []byte) error {
-  log.Println("Message to", c.UserID)
   c.Socket.SetWriteDeadline(time.Now().Add(conf.Socket.WriteWait))
   return c.Socket.WriteMessage(websocket.TextMessage, message)
 }
 
 func (c *Connection) Ping() error {
-  log.Println("Ping:", c.UserID)
   c.Socket.SetWriteDeadline(time.Now().Add(conf.Socket.WriteWait))
   return c.Socket.WriteMessage(websocket.PingMessage, []byte{})
 }

@@ -217,7 +217,11 @@ func RemoveRoomMember(
     if room, err := chat.RemoveRoomMember(profileID, roomID, memberID); err != nil {
       render.JSON(err.HttpCode, err)
     } else {
-      roomCache.PutRoom(roomID, room)
+      if len(room.Members) <= 2 {
+        roomCache.EvictRoom(roomID) // room was deleted
+      } else {
+        roomCache.PutRoom(roomID, room)
+      }
       manager.Broadcast <- &services.BroadcastPackage{
         Message:  &models.Message{Type: "update", Room: roomID},
         Auditory: append(room.Members, memberID),

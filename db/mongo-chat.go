@@ -264,7 +264,7 @@ func (c *MongoChat) GetMessages(profileID string, roomID string, from time.Time,
 
   var messages []models.Message
   if err := db.C(c.mongo.MessagesCollectionName).Find(
-    bson.M{"room": roomID, "timestamp": bson.M{"$lt": from}}).Limit(limit).Sort("timestamp").All(&messages); err != nil {
+    bson.M{"room": roomID, "timestamp": bson.M{"$lt": from}}).Limit(limit).Sort("-timestamp").All(&messages); err != nil {
     return nil, parseMongoDBError(err)
   }
   return messages, nil
