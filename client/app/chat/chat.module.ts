@@ -21,6 +21,7 @@ import {SkipOwnFilterPipe} from "./skip-own-filter.pipe";
 import {PickerModule} from "@ctrl/ngx-emoji-mart";
 import {EmojiModule} from '@ctrl/ngx-emoji-mart/ngx-emoji'
 import {NgxWigModule} from 'ngx-wig';
+import {NewlinePipe} from "./room/newline.pipe";
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import {NgxWigModule} from 'ngx-wig';
     ChatComponent,
     RoomComponent,
     FriendsFilterPipe,
-    SkipOwnFilterPipe
+    SkipOwnFilterPipe,
+    NewlinePipe
   ],
   imports: [
     CommonModule,

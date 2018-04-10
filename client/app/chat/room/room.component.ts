@@ -144,6 +144,12 @@ export class RoomComponent implements OnInit {
     }
   }
 
+  sendOnEnter(event) {
+    if (event.keyCode == 13 && !event.shiftKey) {
+      this.sendMessage()
+    }
+  }
+
   trackByMessageId(index: number, message: Message): string {
     return message.id;
   }

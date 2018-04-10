@@ -44,7 +44,7 @@
   .chat-log-container {
     position: absolute;
     top: 30px;
-    bottom: 64px;
+    bottom: 100px;
     left: 0;
     right: 0;
     .chat-log {
@@ -185,12 +185,13 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 80px;
+    height: 120px;
     z-index: 1;
 
     .chat-form {
       margin: 14px 0 0 10px;
       width: calc(100% - 25px);
+      height: 100px;
 
       .chat-input-field {
         width: 100%;
