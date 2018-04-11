@@ -125,7 +125,7 @@ export class RoomComponent implements OnInit {
   }
 
   loadHistory() {
-    if (this.initialized) {
+    if (this.initialized && !this.loading) {
       const native = this.chatLogContainer.nativeElement;
 
       if (native.scrollTop < 1) {

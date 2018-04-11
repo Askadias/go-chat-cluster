@@ -64,24 +64,22 @@ func main() {
 
   jwtMiddleware := auth.NewJwtMiddleware(jwtOptions)
 
+  // WebSocket Manager
+  bus := db.NewRedisBus(redisBusOptions)
+  connectionManager := services.NewConnectionManager(bus, conf.Socket)
+  m.Map(connectionManager)
+
   // Injecting Services
   cache := db.NewRedisCache(redisCacheOptions)
   facebook := services.NewFacebook(conf.Facebook, &http.Client{
     Timeout: conf.Facebook.Timeout,
   })
-  chat := db.NewMongoChat(conf.Mongo, conf.Chat)
+  chatDB := db.NewMongoChat(conf.Mongo)
+  chat := services.NewChat(conf.Chat, chatDB, chatDB, cache, connectionManager)
+  m.Map(chat)
   m.MapTo(facebook, (*services.OAuth)(nil))
   m.MapTo(facebook, (*services.Account)(nil))
   m.MapTo(facebook, (*services.Friends)(nil))
-  m.MapTo(chat, (*db.Chat)(nil))
-  m.MapTo(chat, (*db.ChatLog)(nil))
-  m.MapTo(chat, (*db.ChatLog)(nil))
-  m.MapTo(cache, (*db.RoomCache)(nil))
-
-  // WebSocket Manager
-  bus := db.NewRedisBus(redisBusOptions)
-  connectionManager := services.NewConnectionManager(bus, chat, conf.Socket)
-  m.Map(connectionManager)
 
   // API Routes
   m.Use(render.Renderer())

@@ -53,15 +53,15 @@
       width: 100%;
 
       .chat-messages {
-        overflow: auto;
+        overflow-x: auto;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
         position: absolute;
         padding-right: 4px;
         left: 4px;
         bottom: 0;
         right: 0;
         max-height: 100%;
-        overflow-y: scroll; /* has to be scroll, not auto */
-        -webkit-overflow-scrolling: touch;
         .loading-zone {
           height: 10px;
         }

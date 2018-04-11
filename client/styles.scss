@@ -11,12 +11,12 @@ body, input, select, textarea, a, button {
   box-sizing: border-box;
 }
 
-html {
+body,
+html{
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
   height: 100%;
-  body {
-    height: 100%;
-    margin: 0;
-  }
 }
 
 /* Change Autocomplete styles in Chrome*/

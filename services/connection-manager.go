@@ -33,7 +33,7 @@ type ConnectionManager struct {
   mutex sync.RWMutex
 }
 
-func NewConnectionManager(bus db.Bus, chat db.Chat, socketConf conf.SocketConf) *ConnectionManager {
+func NewConnectionManager(bus db.Bus, socketConf conf.SocketConf) *ConnectionManager {
   m := &ConnectionManager{
     Register:    make(chan *Connection),
     Unregister:  make(chan *Connection),
@@ -41,7 +41,6 @@ func NewConnectionManager(bus db.Bus, chat db.Chat, socketConf conf.SocketConf) 
     Connections: make(map[string]*Connection),
     socketConf:  socketConf,
     bus:         bus,
-    chat:        chat,
   }
   go m.broadcasting()
   go m.ping()
