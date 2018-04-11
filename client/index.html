@@ -8,11 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="chat-favicon-96x96.png">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <script>
-    window.addEventListener("touchmove", function () {});
-  </script>
+  <script type="text/javascript">
+		touchMove = function(event) {
+			// Prevent scrolling on this element
+			event.preventDefault();
+		}
+	</script>
 </head>
-<body>
+<body ontouchmove="touchMove(event);">
 <chat-root></chat-root>
 </body>
 </html>
