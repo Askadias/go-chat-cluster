@@ -10,8 +10,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script type="text/javascript">
 		touchMove = function(event) {
-			// Prevent scrolling on this element
-			event.preventDefault();
+			if(!$(e.target).hasClass("scrollable")) {
+       e.preventDefault();
+     }
 		}
 	</script>
 </head>
