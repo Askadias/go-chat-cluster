@@ -53,8 +53,7 @@
       width: 100%;
 
       .chat-messages {
-        overflow-x: auto;
-        overflow-y: scroll;
+        overflow: auto;
         -webkit-overflow-scrolling: touch;
         position: absolute;
         padding-right: 4px;
