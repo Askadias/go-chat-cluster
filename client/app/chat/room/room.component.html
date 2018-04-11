@@ -10,7 +10,7 @@
   <div class="room-bg"></div>
   <div class="chat-log-container">
     <div class="chat-log">
-      <div class="chat-messages scrollable" #chatLogElement (scroll)="loadHistory()" ontouchmove="function(e){e.stopPropagation();}">
+      <div class="chat-messages scrollable" #chatLogElement (scroll)="loadHistory()">
         <div class="loading-zone"></div>
         <div *ngIf="loading">
           <mat-spinner class="loading-messages"></mat-spinner>
