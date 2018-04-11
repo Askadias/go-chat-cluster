@@ -30,16 +30,16 @@ func ConnectToChat(
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
     profileID := claims["jti"].(string)
-    if conn, err := upgrader.Upgrade(res, req, nil); err != nil {
+    if socket, err := upgrader.Upgrade(res, req, nil); err != nil {
       render.JSON(http.StatusInternalServerError, conf.NewApiError(err))
     } else {
-      conn.SetReadLimit(conf.Socket.MaxMessageSize)
-      conn.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
-      conn.SetPongHandler(func(string) error {
-        conn.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
+      socket.SetReadLimit(conf.Socket.MaxMessageSize)
+      socket.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
+      socket.SetPongHandler(func(string) error {
+        socket.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
         return nil
       })
-      connection := services.NewConnection(profileID, conn)
+      connection := &services.Connection{UserID: profileID, Socket: socket}
       manager.Register <- connection
     }
   } else {
