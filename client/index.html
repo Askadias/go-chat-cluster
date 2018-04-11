@@ -9,10 +9,9 @@
   <link rel="icon" type="image/x-icon" href="chat-favicon-96x96.png">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script>
-    function preventBehavior(e) {
+    window.addEventListener("touchmove", function (e) {
         e.preventDefault(); 
-    };
-    document.addEventListener("touchmove", preventBehavior, false);
+    };, false);
   </script>
 </head>
 <body>
