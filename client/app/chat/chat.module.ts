@@ -11,6 +11,8 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatToolbarModule} from '@angular/material/toolbar';
 import {ChatComponent} from './chat.component';
 import {SidebarComponent} from "../common/sidebar/sidebar.component";
 import {PersonComponent} from "./person/person.component";
@@ -22,6 +24,7 @@ import {PickerModule} from "@ctrl/ngx-emoji-mart";
 import {EmojiModule} from '@ctrl/ngx-emoji-mart/ngx-emoji'
 import {NgxWigModule} from 'ngx-wig';
 import {NewlinePipe} from "./room/newline.pipe";
+import {MediaMatcher} from "@angular/cdk/layout";
 
 
 @NgModule({
@@ -46,13 +49,17 @@ import {NewlinePipe} from "./room/newline.pipe";
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatSidenavModule,
+    MatToolbarModule,
     HttpClientModule,
     HttpClientXsrfModule,
     PickerModule,
     EmojiModule,
     NgxWigModule
   ],
-  providers: []
+  providers: [
+    MediaMatcher
+  ]
 })
 export class ChatModule {
 }

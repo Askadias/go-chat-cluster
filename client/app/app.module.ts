@@ -20,6 +20,7 @@ import {ChatService} from "./services/chat.service";
 import {AuthGuard} from "./login/auth.guard";
 import {AuthInterceptor} from "./login/auth-interceptor";
 import {CookieService} from "ngx-cookie-service";
+import {AuthenticatedGuard} from "./login/authenticated.guard";
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import {CookieService} from "ngx-cookie-service";
   providers: [
     CookieService,
     AuthGuard,
+    AuthenticatedGuard,
     AuthService,
     ChatService,
     {

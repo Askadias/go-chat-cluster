@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef, OnDestroy} from '@angular/core';
 import {environment as env} from '../../environments/environment';
 import {ActivatedRoute} from "@angular/router";
 import {ChatService} from "../services/chat.service";
@@ -7,9 +7,7 @@ import {AuthService} from "../services/auth.service";
 import {Room} from "../domain/room";
 import {RoomContainer} from "../domain/room-container";
 import {Message} from "../domain/message";
-import {range} from 'rxjs/observable/range'
-import {zip} from 'rxjs/observable/zip'
-import {timer} from 'rxjs/observable/timer'
+import {MediaMatcher} from '@angular/cdk/layout';
 import {exponentialBackOff} from "../common/utils";
 
 @Component({
@@ -17,10 +15,12 @@ import {exponentialBackOff} from "../common/utils";
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
 
   protected oauthConfig: any;
-  private isPopup = true;
+  private readonly isPopup = true;
+  private readonly _mobileQueryListener: () => void;
+  mobileQuery: MediaQueryList;
   errors: string[] = [];
   profile: User;
   friends: User[] = [];
@@ -34,7 +34,13 @@ export class ChatComponent implements OnInit {
 
   constructor(public route: ActivatedRoute,
               private auth: AuthService,
-              private chat: ChatService) {
+              private chat: ChatService,
+              changeDetectorRef: ChangeDetectorRef,
+              media: MediaMatcher) {
+    this.mobileQuery = media.matchMedia('(max-width: 600px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
+
     this.oauthConfig = env.oauth;
     this.loadingFriends = true;
     this.profile = auth.getProfile();
@@ -126,6 +132,14 @@ export class ChatComponent implements OnInit {
         }
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    this.mobileQuery.removeListener(this._mobileQueryListener);
+  }
+
+  isMobile(): boolean {
+    return this.mobileQuery.matches
   }
 
   loginWith(provider: string) {

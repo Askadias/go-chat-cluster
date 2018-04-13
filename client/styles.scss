@@ -75,8 +75,37 @@ a, button, input, mat-checkbox, mat-icon {
 //==============================================
 // MATERIAL DESIGN ICONS SIZING
 
-.material-icons.md-14 {
+.flat-button.md-14 {
   font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.flat-button.md-18 {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.flat-button.md-24 {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.flat-button.md-36 {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.flat-button.md-48 {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+.material-icons.md-14 {
   width: 14px;
   height: 14px;
 }

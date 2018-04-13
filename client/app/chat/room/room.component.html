@@ -1,20 +1,14 @@
 <div class="room {{className}}" *ngIf="_room">
-  <div class="room-header">
-    <button class="flat-button room-close-btn" (click)="close.emit($event)">
-      <mat-icon class="md-24">keyboard_arrow_left</mat-icon>
+  <mat-toolbar color="accent" class="example-toolbar">
+    <button *ngIf="isMobile" class="flat-button md-36" (click)="close.emit($event)">
+      <mat-icon class="md-36">arrow_back</mat-icon>
     </button>
-    <button class="flat-button room-dismiss-btn" (click)="dismiss.emit($event)">
-      <mat-icon class="md-24">close</mat-icon>
-    </button>
-  </div>
+  </mat-toolbar>
   <div class="room-bg"></div>
   <div class="chat-log-container">
     <div class="chat-log">
-      <div class="chat-messages scrollable" #chatLogElement (scroll)="loadHistory()">
+      <div class="chat-messages" #chatLogElement (scroll)="loadHistory()">
         <div class="loading-zone"></div>
-        <div *ngIf="loading">
-          <mat-spinner class="loading-messages"></mat-spinner>
-        </div>
         <div *ngFor="let message of _room.messages; trackBy: trackByMessageId; let i = index"
              class="chat-message"
              [class.mine]="message.from == _room.me.id"

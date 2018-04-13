@@ -1,10 +1,12 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {AuthGuard} from "./login/auth.guard";
+import {AuthenticatedGuard} from "./login/authenticated.guard";
 
 const routes: Routes = [
   {
-    path: 'login/:provider', loadChildren: 'app/login/login.module#LoginModule'
+    path: 'login/:provider', loadChildren: 'app/login/login.module#LoginModule',
+    canActivate: [AuthenticatedGuard]
   },
   {
     path: 'authorized', loadChildren: 'app/oauth-authorized/oauth-authorized.module#OauthAuthorizedModule'

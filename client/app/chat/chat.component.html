@@ -1,22 +1,32 @@
-<div class="chat-theme chat">
-  <chat-sidebar>
-    <div>
+<mat-sidenav-container class="chat-theme chat">
+  <mat-sidenav #menu mode="over" [fixedInViewport]="true">
       <chat-person [person]="profile">
-        <button class="flat-button person-control-btn" (click)="logout()">
+        <button class="flat-button md-36" (click)="logout()">
           <mat-icon class="md-36">exit_to_app</mat-icon>
         </button>
       </chat-person>
-    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="chat-content" [style.width]="isMobile() ? '100%' : '300px'">
+    <mat-toolbar color="accent" class="example-toolbar">
+      <button class="flat-button md-36" (click)="menu.toggle()">
+        <mat-icon class="md-36">menu</mat-icon>
+      </button>
+      <mat-form-field class="friends-filter-input" floatLabel="never">
+        <input matInput #nameFilter placeholder="Friends...">
+      </mat-form-field>
+    </mat-toolbar>
+
     <div class="chat-groups">
       <div class="chat-group" *ngFor="let chat of rooms" [class.active]="isActiveChat(chat)" fxLayout="column">
         <div *ngIf="chat.loading">
           <mat-spinner class="loading-members"></mat-spinner>
         </div>
-        <a (click)="switchToChat(chat)" *ngIf="!isActiveChat(chat)" class="chat-group-overlay-btn"></a>
+        <a (click)="switchToChat(chat);snav.open()" *ngIf="!isActiveChat(chat)" class="chat-group-overlay-btn"></a>
         <chat-person *ngFor="let memberId of chat.room.members | skipOwnFilter:profile.id"
-                     (click)="!isActiveChat(chat) ? switchToChat(chat) : chatWith(memberId)"
+                     (click)="switchToChat(chat);snav.open()"
                      [person]="chat.getUser(memberId)" class="chat-person">
-          <button class="flat-button person-control-grp-btn"
+          <button class="flat-button md-36"
                   (click)="$event.stopPropagation(); removeFromChat(chat, memberId)"
                   *ngIf="chat.amIOwner()">
             <mat-icon class="md-36">close</mat-icon>
@@ -24,22 +34,22 @@
         </chat-person>
       </div>
     </div>
-    <mat-form-field class="friends-filter-input" floatLabel="never">
-      <input matInput #nameFilter placeholder="Friends">
-    </mat-form-field>
+
     <div class="friends" *ngIf="hasFriendsPermissions">
       <chat-person *ngFor="let friend of friends | friendsFilter:nameFilter.value; trackBy: trackByUserId"
-                   (click)="chatWith(friend.id)"
+                   (click)="chatWith(friend.id);snav.open()"
                    [person]="friend">
-        <button class="flat-button person-control-btn" *ngIf="canAddToCurrentChat(friend.id)"
+        <button class="flat-button md-36" *ngIf="canAddToCurrentChat(friend.id)"
                 (click)="$event.stopPropagation(); addToCurrentChat(friend)">
           <mat-icon class="md-36">add</mat-icon>
         </button>
       </chat-person>
     </div>
+
     <div *ngIf="loadingFriends">
       <mat-spinner class="loading-friends"></mat-spinner>
     </div>
+
     <div *ngIf="!hasFriendsPermissions && !loadingFriends">
       <button mat-raised-button fxFlex
               (click)="loginWith('facebook')"
@@ -48,12 +58,21 @@
         Allow friends access to import them from Facebook
       </button>
     </div>
-  </chat-sidebar>
-  <div class="chat-content">
-    <div class="chat-bg"></div>
+  </mat-sidenav-content>
+  <mat-sidenav #snav [disableClose]="!isMobile()"
+               position="end"
+               [mode]="isMobile() ? 'over' : 'side'"
+               [fixedInViewport]="true"
+               [style.width]="isMobile() ? '100%' : 'calc(100% - 300px)'">
+    <mat-toolbar color="accent" class="example-toolbar">
+      <button *ngIf="isMobile()" class="flat-button md-36" (click)="snav.toggle()">
+        <mat-icon class="md-36">menu</mat-icon>
+      </button>
+    </mat-toolbar>
     <chat-room *ngIf="chatOpened"
                [room]="activeRoom"
-               (close)="closeChat()"
+               [isMobile]="isMobile()"
+               (close)="snav.close()"
                (dismiss)="dismissChat(activeRoom)"></chat-room>
-  </div>
-</div>
+  </mat-sidenav>
+</mat-sidenav-container>

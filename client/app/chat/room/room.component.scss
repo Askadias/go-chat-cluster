@@ -33,7 +33,7 @@
   }
   .room-bg {
     position: absolute;
-    top: 0;
+    top: 56px;
     left: 2px;
     right: 0;
     bottom: 0;
@@ -43,7 +43,7 @@
   }
   .chat-log-container {
     position: absolute;
-    top: 30px;
+    top: 56px;
     bottom: 100px;
     left: 0;
     right: 0;
@@ -181,8 +181,7 @@
   }
 
   .chat-input {
-    background: linear-gradient(to top, #2a2a2a 2%, #2a2a2a 80%, transparent 100%);
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
