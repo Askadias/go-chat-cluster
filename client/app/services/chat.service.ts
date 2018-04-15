@@ -26,8 +26,8 @@ export class ChatService {
     return this.http.post<Room>(`/api/rooms`, room);
   }
 
-  addMember(roomId: string, memberId: string): Observable<any> {
-    return this.http.post(`/api/rooms/${roomId}/members/${memberId}`, {});
+  addMember(roomId: string, memberId: string): Observable<Room> {
+    return this.http.post<Room>(`/api/rooms/${roomId}/members/${memberId}`, {});
   }
 
   kickMember(roomId: string, memberId: string): Observable<any> {

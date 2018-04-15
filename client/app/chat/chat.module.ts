@@ -14,6 +14,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTabsModule} from '@angular/material/tabs';
+import {MatMenuModule} from '@angular/material/menu';
 import {ChatComponent} from './chat.component';
 import {SidebarComponent} from "../common/sidebar/sidebar.component";
 import {PersonComponent} from "./person/person.component";
@@ -55,6 +56,7 @@ import { GroupComponent } from './group/group.component';
     MatSidenavModule,
     MatToolbarModule,
     MatTabsModule,
+    MatMenuModule,
     HttpClientModule,
     HttpClientXsrfModule,
     PickerModule,

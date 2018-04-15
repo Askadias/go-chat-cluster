@@ -75,7 +75,8 @@
     <chat-room *ngIf="chatOpened"
                [room]="activeRoom"
                [isMobile]="isMobile()"
-               (close)="snav.open()"
+               (back)="snav.open()"
+               (close)="closeChat()"
                (dismiss)="dismissChat(activeRoom)"></chat-room>
   </mat-sidenav-content>
 </mat-sidenav-container>

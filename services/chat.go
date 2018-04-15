@@ -96,23 +96,40 @@ func (c *Chat) DeleteRoom(profileID string, roomID string) *conf.ApiError {
 
 // Add room member to a specific chat room.
 // Checks if members count exceeds the configured maximum
-func (c *Chat) AddRoomMember(profileID string, roomID string, memberID string) *conf.ApiError {
+func (c *Chat) AddRoomMember(profileID string, roomID string, memberID string) (*models.Room, *conf.ApiError) {
   if room, err := c.GetRoom(profileID, roomID); err != nil {
-    return err
+    return nil, err
   } else {
+    if isMember(memberID, room) {
+      return nil, conf.ErrAlreadyExists
+    }
+    // if current room is a private one, then create a new room for the group chat
+    if len(room.Members) == 2 {
+      room.Members = append(room.Members, memberID)
+      return c.CreateRoom(profileID, *room)
+    }
     if len(room.Members) >= c.chatConf.MaxMembers {
-      return conf.ErrTooManyMembers
+      return nil, conf.ErrTooManyMembers
     }
     if err := c.chatDB.AddRoomMember(roomID, memberID); err != nil {
-      return err
+      return nil, err
     }
     c.roomCache.PutRoom(roomID, room) // TODO concurrency check
     c.connectionManager.Broadcast <- &BroadcastPackage{
       Message:  &models.Message{Type: "update", Room: roomID},
       Auditory: append(room.Members, memberID),
     }
-    return nil
+    return room, nil
   }
+}
+
+func isMember(userID string, room *models.Room) bool {
+  for _, memberID := range room.Members {
+    if memberID == userID {
+      return true
+    }
+  }
+  return false
 }
 
 // Removes room member by the room owner.

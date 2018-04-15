@@ -167,10 +167,10 @@ func AddRoomMember(
       }
     }
 
-    if err := chatService.AddRoomMember(profileID, roomID, memberID); err != nil {
+    if room, err := chatService.AddRoomMember(profileID, roomID, memberID); err != nil {
       render.JSON(err.HttpCode, err)
     } else {
-      res.WriteHeader(http.StatusOK)
+      render.JSON(http.StatusOK, room)
     }
   } else {
     render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)

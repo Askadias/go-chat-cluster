@@ -55,19 +55,6 @@ export class RoomContainer {
     }
   }
 
-  addMember(friend: User) {
-    this.loading = true;
-    this.chat.addMember(this.room.id, friend.id).subscribe(() => {
-      this.loading = false;
-      this.room.members.push(friend.id);
-      this.accounts.set(friend.id, friend);
-      this.chat.send(new Message(this.room.id, this.me.id, '', Date.now(), 'update'))
-    }, (error) => {
-      this.loading = false;
-      this.errors = [error.message];
-    })
-  }
-
   onMessage(message: Message) {
     this.messages.push(message);
     if (message.from == this.me.id) {

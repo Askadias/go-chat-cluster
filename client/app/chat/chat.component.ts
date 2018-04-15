@@ -178,7 +178,27 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   addToCurrentChat(friend: User) {
-    this.activeRoom.addMember(friend);
+    this.addMember(friend);
+    this.activeTab = CHATS_IDX;
+  }
+
+  addMember(friend: User) {
+    this.activeRoom.loading = true;
+    this.chat.addMember(this.activeRoom.room.id, friend.id).subscribe((room) => {
+      this.activeRoom.loading = false;
+      if (room.id != this.activeRoom.room.id) {
+        const roomContainer = new RoomContainer(this.profile, room, this.auth, this.chat);
+        this.rooms.push(roomContainer);
+        this.switchToChat(roomContainer)
+      } else {
+        this.activeRoom.room.members.push(friend.id);
+        this.activeRoom.accounts.set(friend.id, friend);
+        this.chat.send(new Message(this.activeRoom.room.id, this.profile.id, '', Date.now(), 'update'))
+      }
+    }, (error) => {
+      this.activeRoom.loading = false;
+      this.errors = [error.message];
+    })
   }
 
   removeFromChat(roomContainer: RoomContainer, userId: string) {
@@ -214,7 +234,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.loadingRooms = true;
     this.chat.deleteRoom(roomContainer.room.id).subscribe(() => {
         this.loadingRooms = false;
-        this.removeRoomFromPool(roomContainer.room.id);
+        // this.removeRoomFromPool(roomContainer.room.id);
       }, (error) => {
         this.loadingRooms = false;
         this.errors = [error.message];

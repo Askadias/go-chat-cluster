@@ -1,8 +1,21 @@
 <div class="room {{className}}" *ngIf="_room">
-  <mat-toolbar color="accent" class="example-toolbar">
-    <button *ngIf="isMobile" class="flat-button md-36" (click)="close.emit($event)">
+  <mat-toolbar color="accent" class="room-toolbar">
+    <button *ngIf="isMobile" class="flat-button md-36" (click)="back.emit($event)">
       <mat-icon class="md-36">arrow_back</mat-icon>
     </button>
+    <button class="flat-button md-36 room-menu" [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="close.emit($event)">
+        <mat-icon>close</mat-icon>
+        <span>Close Chat</span>
+      </button>
+      <button mat-menu-item (click)="dismiss.emit($event)">
+        <mat-icon>delete_forever</mat-icon>
+        <span>Exit and Remove History</span>
+      </button>
+    </mat-menu>
   </mat-toolbar>
   <div class="room-bg"></div>
   <div class="chat-log-container">

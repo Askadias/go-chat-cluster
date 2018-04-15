@@ -15,6 +15,7 @@ export class RoomComponent implements OnInit {
 
   @Input() className = '';
   @Input() isMobile = false;
+  @Output() back: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
   @Output() dismiss: EventEmitter<any> = new EventEmitter<any>();
 
