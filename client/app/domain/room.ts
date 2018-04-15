@@ -2,6 +2,7 @@ import {User} from './user';
 
 export class Room {
   id: string;
+  alias?: string;
   owner: string;
   members: string[] = [];
 

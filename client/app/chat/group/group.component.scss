@@ -2,7 +2,7 @@
 
 $timings: ease-out;
 
-.person {
+.group {
   position: relative;
   transition: border .2s $timings, color .1s $timings, background .2s $timings, rotate3d 0.2s $timings;
   text-align: left;
@@ -15,34 +15,49 @@ $timings: ease-out;
   display: block;
   width: 100%;
 
-  .person-link {
+  .group-link {
     position: relative;
     text-decoration: none;
     color: #969696;
     transition: all .0s $timings;
 
-    .avatar-container {
-      margin: 3px;
+    .avatars-stack {
       position: relative;
-      width: 43px;
-      height: 48px;
-      background-color: transparent;
-      overflow: hidden;
-      min-height: 48px;
-      min-width: 48px;
-      border-radius: 50%;
-      background-size: cover;
-      border: 2px solid rgba(255, 255, 255, 0);
-      transition: all .2s $timings;
-      display: block;
+      height: 52px;
+      width: 68px;
 
-      .avatar {
+      .avatar-container {
+        position: absolute;
+        margin: 3px 3px 3px 5px;
+        width: 43px;
         height: 48px;
-        width: 48px;
+        background-color: transparent;
+        overflow: hidden;
+        min-height: 48px;
+        min-width: 48px;
+        border-radius: 50%;
+        background-size: cover;
+        border: 2px solid #666;
         transition: all .2s $timings;
+        display: block;
+
+        &:first-child {
+          margin-left: 0;
+        }
+        &:last-child {
+          margin-left: 10px;
+        }
+
+        .avatar {
+          height: 48px;
+          width: 48px;
+          transition: all .2s $timings;
+        }
       }
     }
-    .person-name {
+
+
+    .group-name {
       vertical-align: middle;
       transition: all .2s $timings;
       min-width: 238px;
@@ -51,7 +66,7 @@ $timings: ease-out;
       }
     }
   }
-  .person-controls {
+  .group-controls {
     position: absolute;
     top: 0;
     right: 8px;
@@ -59,7 +74,7 @@ $timings: ease-out;
     left: 52px;
     transition: all .2s $timings;
   }
-  .person-controls-opener {
+  .group-controls-opener {
     width: 24px;
     height: 24px;
     text-decoration: none;
@@ -71,9 +86,11 @@ $timings: ease-out;
   }
 
   &:hover {
-    background-color: $chat-grey-4;
-    .person-link {
+    .group-link {
       color: $accent-color;
+      .avatars-stack .avatar-container {
+        border-color: $accent-color;
+      }
     }
   }
 }

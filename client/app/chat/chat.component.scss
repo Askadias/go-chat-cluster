@@ -10,15 +10,8 @@
 .chat {
   height: 100%;
   .chat-content {
-    //transition: all .1s ease-out;
     height: 100%;
-    //width: calc(100% - 300px);
     background-color: #2a2a2a;
-    //border-right: 1px solid #666;
-    //right: 0;
-    //top: 0;
-    //left: 300px;
-    //bottom: 0;
     position: relative;
 
     .chat-bg {
@@ -40,7 +33,6 @@
 
 .sidebar {
   height: 100%;
-  //width: 300px;
   background-color: $chat-grey-0;
 }
 
@@ -87,29 +79,18 @@
 
 .chat-group {
   transition: all 0.2s ease-in;
-  background-color: #333;
-  border: 1px solid #666;
-  border-radius: 20px;
   position: relative;
   display: inline-flex;
   width: 100%;
-  opacity: 0.5;
-  margin: 5px 0;
+  height: 62px;
+  padding: 4px 0;
   overflow: hidden;
   &.active {
     border-left: transparent;
     background-color: #2a2a2a;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    right: -1px;
-    opacity: 1;
-    .chat-person {
-      .person {
-        &:hover {
-          background-color: white;
-        }
-      }
-    }
+  }
+  &:hover{
+    background-color: #333;
   }
   .loading-members {
     margin: auto;

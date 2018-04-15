@@ -1,0 +1,34 @@
+<div class="group {{className}}"
+     *ngIf="roomContainer"
+     [class.active]="active"
+     fxLayout="row"
+     fxLayoutAlign="space-between center">
+  <a (click)="click.emit($event)"
+     class="group-link"
+     fxLayout="row"
+     fxLayoutAlign="start center">
+    <div class="avatars-stack">
+      <div class="avatar-container"
+           *ngFor="let memberId of roomContainer.room.members | skipOwnFilter:profile.id; let i=index"
+           fxFlex="48px">
+        <div *ngIf="i < 3 && roomContainer.getUser(memberId)">
+          <img src="{{ roomContainer.getUser(memberId).avatarUrl }}"
+               class="avatar"
+               *ngIf="roomContainer.getUser(memberId).avatarUrl; else defaultAvatar"/>
+          <ng-template #defaultAvatar>
+            <img src="../../../assets/img/avatars/default-avatar.png" class="avatar"/>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="group-name">
+    {{ roomContainer.getName() }}
+    </div>
+  </a>
+  <div class="group-controls"
+       fxLayout="row"
+       fxLayoutAlign="end center"
+       fxFlex>
+    <ng-content></ng-content>
+  </div>
+</div>

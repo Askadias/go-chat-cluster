@@ -1,7 +1,6 @@
 <div class="person {{className}}"
      *ngIf="person"
      [class.active]="active"
-     [class.compact]="compact"
      fxLayout="row"
      fxLayoutAlign="space-between center">
   <a (click)="click.emit($event)"
@@ -16,15 +15,11 @@
         <img src="../../../assets/img/avatars/default-avatar.png" class="avatar"/>
       </ng-template>
     </div>
-    <div *ngIf="!compact"
-         class="person-name"
-          [@fadeShiftAnimation]>
+    <div class="person-name">
       {{ person.name }}
     </div>
   </a>
   <div class="person-controls"
-       *ngIf="!compact"
-       [@fadeAnimation]
        fxLayout="row"
        fxLayoutAlign="end center"
        fxFlex>

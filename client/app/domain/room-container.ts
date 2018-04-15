@@ -36,6 +36,25 @@ export class RoomContainer {
     this.fetchUsers();
   }
 
+  getName(): string {
+    if (!this.room.alias) {
+      let name: string = 'Group Chat #' + this.room.id;
+      let users = this.getMembers();
+      if (users.length > 0) {
+        name = users[0].name;
+      }
+      if (users.length > 1) {
+        name += ',' + users[0].name;
+      }
+      if (users.length > 2) {
+        name += ',...'
+      }
+      return name
+    } else {
+      return this.room.alias
+    }
+  }
+
   addMember(friend: User) {
     this.loading = true;
     this.chat.addMember(this.room.id, friend.id).subscribe(() => {
@@ -56,6 +75,17 @@ export class RoomContainer {
     } else {
       this.onMessageReceived.emit(message);
     }
+  }
+
+  getMembers(): User[] {
+    let users: User[] = [];
+    this.room.members.forEach((memberId)=> {
+      let user = this.getUser(memberId);
+      if (user) {
+        users.push(this.getUser(memberId));
+      }
+    });
+    return users.filter((user: User)=> user.id != this.me.id)
   }
 
   amIOwner() {

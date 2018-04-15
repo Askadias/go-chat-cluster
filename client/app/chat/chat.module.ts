@@ -13,6 +13,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatTabsModule} from '@angular/material/tabs';
 import {ChatComponent} from './chat.component';
 import {SidebarComponent} from "../common/sidebar/sidebar.component";
 import {PersonComponent} from "./person/person.component";
@@ -25,6 +26,7 @@ import {EmojiModule} from '@ctrl/ngx-emoji-mart/ngx-emoji'
 import {NgxWigModule} from 'ngx-wig';
 import {NewlinePipe} from "./room/newline.pipe";
 import {MediaMatcher} from "@angular/cdk/layout";
+import { GroupComponent } from './group/group.component';
 
 
 @NgModule({
@@ -35,7 +37,8 @@ import {MediaMatcher} from "@angular/cdk/layout";
     RoomComponent,
     FriendsFilterPipe,
     SkipOwnFilterPipe,
-    NewlinePipe
+    NewlinePipe,
+    GroupComponent
   ],
   imports: [
     CommonModule,
@@ -51,6 +54,7 @@ import {MediaMatcher} from "@angular/cdk/layout";
     MatProgressSpinnerModule,
     MatSidenavModule,
     MatToolbarModule,
+    MatTabsModule,
     HttpClientModule,
     HttpClientXsrfModule,
     PickerModule,

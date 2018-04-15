@@ -11,52 +11,58 @@
         </button>
       </chat-person>
     </mat-toolbar>
-    <mat-form-field class="friends-filter-input" floatLabel="never">
-      <input matInput #nameFilter placeholder="Friends...">
-    </mat-form-field>
 
-    <div class="chat-groups">
-      <div class="chat-group" *ngFor="let chat of rooms" [class.active]="isActiveChat(chat)" fxLayout="column">
-        <div *ngIf="chat.loading">
-          <mat-spinner class="loading-members"></mat-spinner>
+    <mat-tab-group #tab [dynamicHeight]="true" [color]="'#fff'" [@.disabled]="true"
+                   [selectedIndex]="activeTab" [disableRipple]="true"
+                   (selectChange)="onTabChange($event)">
+
+      <mat-tab label="Friends">
+        <ng-template mat-tab-label>
+          <mat-icon class="md-36">person</mat-icon>
+        </ng-template>
+        <div class="friends" *ngIf="hasFriendsPermissions">
+          <mat-form-field class="friends-filter-input" floatLabel="never">
+            <input matInput #nameFilter placeholder="Friends...">
+          </mat-form-field>
+          <chat-person *ngFor="let friend of friends | friendsFilter:nameFilter.value; trackBy: trackByUserId"
+                       (click)="chatWith(friend.id);isMobile()?snav.close():true"
+                       [person]="friend">
+            <button class="flat-button md-36" *ngIf="canAddToCurrentChat(friend.id)"
+                    (click)="$event.stopPropagation(); addToCurrentChat(friend)">
+              <mat-icon class="md-36">add</mat-icon>
+            </button>
+          </chat-person>
         </div>
-        <a (click)="switchToChat(chat);isMobile()?snav.close():true" *ngIf="!isActiveChat(chat)"
-           class="chat-group-overlay-btn"></a>
-        <chat-person *ngFor="let memberId of chat.room.members | skipOwnFilter:profile.id"
-                     (click)="switchToChat(chat);isMobile()?snav.close():true"
-                     [person]="chat.getUser(memberId)" class="chat-person">
-          <button class="flat-button md-36"
-                  (click)="$event.stopPropagation(); removeFromChat(chat, memberId)"
-                  *ngIf="chat.amIOwner()">
-            <mat-icon class="md-36">close</mat-icon>
+        <div *ngIf="loadingFriends">
+          <mat-spinner class="loading-friends"></mat-spinner>
+        </div>
+        <div *ngIf="!hasFriendsPermissions && !loadingFriends">
+          <button mat-raised-button fxFlex
+                  (click)="loginWith('facebook')"
+                  class="facebook-btn">
+            <mat-icon svgIcon="facebook" class="fb-icon"></mat-icon>
+            Allow friends access to import them from Facebook
           </button>
-        </chat-person>
-      </div>
-    </div>
+        </div>
+      </mat-tab>
 
-    <div class="friends" *ngIf="hasFriendsPermissions">
-      <chat-person *ngFor="let friend of friends | friendsFilter:nameFilter.value; trackBy: trackByUserId"
-                   (click)="chatWith(friend.id);isMobile()?snav.close():true"
-                   [person]="friend">
-        <button class="flat-button md-36" *ngIf="canAddToCurrentChat(friend.id)"
-                (click)="$event.stopPropagation(); addToCurrentChat(friend)">
-          <mat-icon class="md-36">add</mat-icon>
-        </button>
-      </chat-person>
-    </div>
+      <mat-tab label="Chats">
+        <ng-template mat-tab-label>
+          <mat-icon class="md-36">chat_bubble</mat-icon>
+        </ng-template>
+        <div class="chat-groups">
+          <div class="chat-group" *ngFor="let chat of rooms" [class.active]="isActiveChat(chat)" fxLayout="column">
+            <div *ngIf="chat.loading">
+              <mat-spinner class="loading-members"></mat-spinner>
+            </div>
+            <chat-group [roomContainer]="chat" [profile]="profile"
+                        (click)="switchToChat(chat);isMobile()?snav.close():true">
 
-    <div *ngIf="loadingFriends">
-      <mat-spinner class="loading-friends"></mat-spinner>
-    </div>
-
-    <div *ngIf="!hasFriendsPermissions && !loadingFriends">
-      <button mat-raised-button fxFlex
-              (click)="loginWith('facebook')"
-              class="facebook-btn">
-        <mat-icon svgIcon="facebook" class="fb-icon"></mat-icon>
-        Allow friends access to import them from Facebook
-      </button>
-    </div>
+            </chat-group>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
   </mat-sidenav>
 
   <mat-sidenav-content class="chat-content" [style.width]="isMobile() ? '100%' : 'calc(100% - 300px)'">

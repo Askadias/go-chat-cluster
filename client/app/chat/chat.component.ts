@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectorRef, OnDestroy} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {environment as env} from '../../environments/environment';
 import {ActivatedRoute} from "@angular/router";
 import {ChatService} from "../services/chat.service";
@@ -9,6 +9,10 @@ import {RoomContainer} from "../domain/room-container";
 import {Message} from "../domain/message";
 import {MediaMatcher} from '@angular/cdk/layout';
 import {exponentialBackOff} from "../common/utils";
+import {MatTabChangeEvent} from "@angular/material";
+
+const FRIENDS_IDX = 0;
+const CHATS_IDX = 1;
 
 @Component({
   selector: 'chat-component',
@@ -31,6 +35,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   foldSocialBar = false;
   chatOpened = false;
   hasFriendsPermissions = false;
+  activeTab = CHATS_IDX;
 
   constructor(public route: ActivatedRoute,
               private auth: AuthService,
@@ -156,9 +161,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       && !!roomContainer.room.members.find((id) => id == userId)
     );
     if (existingRoom) {
-      if (this.activeRoom.room.id !== existingRoom.room.id) {
-        this.switchToChat(existingRoom)
-      }
+      this.switchToChat(existingRoom)
     } else {
       this.chat.newRoom(new Room(this.profile.id, userId)).subscribe(
         (newRoom) => {
@@ -193,6 +196,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   switchToChat(chat: RoomContainer) {
     this.activeRoom = chat;
     this.chatOpened = true;
+    this.activeTab = CHATS_IDX;
   }
 
   canAddToCurrentChat(userId: string) {
@@ -230,5 +234,9 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   trackByUserId(index: number, friend: User): string {
     return friend.id;
+  }
+
+  onTabChange(e: MatTabChangeEvent) {
+    this.activeTab = e.index;
   }
 }

@@ -51,6 +51,21 @@ $chat-dark-theme-background: (
     background-color: $chat-bg-color;
   }
 
+  .mat-tab-labels {
+    display: flex;
+    .mat-tab-label {
+      min-width: 100px;
+      flex: 1 1 auto;
+      transition: all 0.1s ease-in;
+      &:hover {
+        background-color: #323232;
+      }
+    }
+    .mat-tab-label-active {
+      opacity: 1;
+    }
+  }
+
   .mat-toolbar-row, .mat-toolbar-single-row {
     height: 56px;
   }
