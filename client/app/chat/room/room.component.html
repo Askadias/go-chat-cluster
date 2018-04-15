@@ -14,8 +14,8 @@
              [class.mine]="message.from == _room.me.id"
              [class.join]="isNearestMessage(message, i)"
              [class.head]="isHeadMessage(message, i)">
-          <div class="chat-message-from">
-            <div class="chat-avatar-container" fxFlex="48px" *ngIf="isHeadMessage(message, i)">
+          <div class="chat-message-from" *ngIf="isHeadMessage(message, i)">
+            <div class="chat-avatar-container" fxFlex="48px">
               <img src="{{ getAvatar(message.from) }}"
                    class="chat-avatar"
                    *ngIf="getAvatar(message.from); else defaultAvatar"/>

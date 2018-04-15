@@ -107,6 +107,7 @@
             padding: 8px 10px;
             position: relative;
             margin-right: 68px;
+            margin-left: 10px;
             top: 7px;
           }
           .chat-message-timestamp {
@@ -124,7 +125,7 @@
             .chat-message-text {
               background: #423c5d;
               margin-left: 68px;
-              margin-right: 0;
+              margin-right: 10px;
             }
             .chat-message-timestamp {
               right: initial;

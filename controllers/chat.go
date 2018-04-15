@@ -250,6 +250,8 @@ func GetChatLog(
     limit, err := strconv.Atoi(limitParam)
     if err != nil {
       limit = conf.Chat.DefaultMessagesLimit // If from is not a valid integer, ignore it
+    } else if limit > conf.Chat.MaxMessagesLimit {
+      limit = conf.Chat.MaxMessagesLimit // upper limit
     }
 
     if messages, err := chatService.GetMessages(profileID, roomID, from, limit); err != nil {

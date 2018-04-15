@@ -1,12 +1,19 @@
 @import "../../variables";
 
+.profile-toolbar{
+  padding: 0;
+  .profile {
+    width: 100%;
+  }
+}
+
 .chat {
   height: 100%;
   .chat-content {
     //transition: all .1s ease-out;
     height: 100%;
     //width: calc(100% - 300px);
-    //background-color: #2a2a2a;
+    background-color: #2a2a2a;
     //border-right: 1px solid #666;
     //right: 0;
     //top: 0;

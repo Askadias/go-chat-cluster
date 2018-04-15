@@ -67,7 +67,9 @@ type ChatConf struct {
   // Maximum number of opened chat rooms per user
   MaxOpenedRooms int `default:"10"`
   // Default limit of messages to be returned with a single request
-  DefaultMessagesLimit int `default:"10"`
+  DefaultMessagesLimit int `default:"50"`
+  // Maximum limit of messages to be returned with a single request
+  MaxMessagesLimit int `default:"100"`
 }
 
 var Redis RedisConf
