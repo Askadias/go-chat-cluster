@@ -23,8 +23,9 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   protected oauthConfig: any;
   private readonly isPopup = true;
-  private readonly _mobileQueryListener: () => void;
+  private readonly _mediaQueryListener: () => void;
   mobileQuery: MediaQueryList;
+  tabletQuery: MediaQueryList;
   errors: string[] = [];
   profile: User;
   friends: User[] = [];
@@ -43,8 +44,10 @@ export class ChatComponent implements OnInit, OnDestroy {
               changeDetectorRef: ChangeDetectorRef,
               media: MediaMatcher) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
-    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this.mobileQuery.addListener(this._mobileQueryListener);
+    this.tabletQuery = media.matchMedia('(max-width: 1200px)');
+    this._mediaQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mediaQueryListener);
+    this.tabletQuery.addListener(this._mediaQueryListener);
 
     this.oauthConfig = env.oauth;
     this.loadingFriends = true;
@@ -140,11 +143,15 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.mobileQuery.removeListener(this._mobileQueryListener);
+    this.mobileQuery.removeListener(this._mediaQueryListener);
   }
 
   isMobile(): boolean {
     return this.mobileQuery.matches
+  }
+
+  isTablet(): boolean {
+    return this.tabletQuery.matches
   }
 
   loginWith(provider: string) {

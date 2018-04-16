@@ -74,6 +74,7 @@
     <chat-room *ngIf="chatOpened"
                [room]="activeRoom"
                [isMobile]="isMobile()"
+               [isTablet]="isTablet()"
                (startChat)="onStartChat($event)"
                (back)="snav.open()"
                (close)="closeChat()"

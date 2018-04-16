@@ -13,7 +13,7 @@
     <div class="room-members" fxLayout="row" *ngIf="_room.room.members.length > 2">
       <chat-person *ngFor="let memberId of _room.room.members | skipOwnFilter:_room.me.id"
                    [matMenuTriggerFor]="member_menu"
-                   [person]="_room.getUser(memberId)">
+                   [person]="_room.getUser(memberId)" [compact]="isTablet || _room.room.members.length > 4">
         <mat-menu #member_menu="matMenu">
           <button mat-menu-item (click)="startChat.emit({memberId: memberId})">
             <mat-icon>chat</mat-icon>
