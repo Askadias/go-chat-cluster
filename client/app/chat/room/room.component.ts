@@ -18,12 +18,12 @@ export class RoomComponent implements OnInit {
   @Output() back: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
   @Output() dismiss: EventEmitter<any> = new EventEmitter<any>();
+  @Output() startChat: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('chatLogElement') private chatLogContainer: ElementRef;
 
   _room: RoomContainer;
   members: User[];
-  me: User;
   loading = false;
   sending = false;
   errors: string[] = [];

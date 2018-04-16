@@ -45,7 +45,7 @@ $timings: ease-out;
     .person-name {
       vertical-align: middle;
       transition: all .2s $timings;
-      min-width: 238px;
+      //min-width: 238px;
       &.extinguished {
         opacity: 0.2;
       }
@@ -71,7 +71,7 @@ $timings: ease-out;
   }
 
   &:hover {
-    background-color: $chat-grey-4;
+    //background-color: $chat-grey-4;
     .person-link {
       color: $accent-color;
     }

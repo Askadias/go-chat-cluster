@@ -41,7 +41,12 @@ func (c *Chat) CreateRoom(profileID string, room models.Room) (*models.Room, *co
     }
   }
   log.Println("Creating new chat room for", profileID)
-  return c.chatDB.CreateRoom(profileID, room)
+  if room, err := c.chatDB.CreateRoom(profileID, room); err != nil {
+    return nil, err
+  } else {
+    c.roomCache.PutRoom(room.ID, room)
+    return room, nil
+  }
 }
 
 // Returns list of rooms that current user is member of
@@ -103,9 +108,9 @@ func (c *Chat) AddRoomMember(profileID string, roomID string, memberID string) (
     if isMember(memberID, room) {
       return nil, conf.ErrAlreadyExists
     }
+    room.Members = append(room.Members, memberID)
     // if current room is a private one, then create a new room for the group chat
     if len(room.Members) == 2 {
-      room.Members = append(room.Members, memberID)
       return c.CreateRoom(profileID, *room)
     }
     if len(room.Members) >= c.chatConf.MaxMembers {
@@ -153,7 +158,8 @@ func (c *Chat) RemoveRoomMember(profileID string, roomID string, memberID string
         c.roomCache.EvictRoom(roomID)
       }
     } else {
-      c.roomCache.PutRoom(roomID, room)
+      c.roomCache.EvictRoom(roomID)
+      //c.roomCache.PutRoom(roomID, room)
     }
     c.connectionManager.Broadcast <- &BroadcastPackage{
       Message:  &models.Message{Type: "update", Room: roomID},

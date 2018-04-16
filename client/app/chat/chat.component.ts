@@ -177,6 +177,10 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
+  onStartChat(event) {
+    this.chatWith(event.memberId)
+  }
+
   addToCurrentChat(friend: User) {
     this.addMember(friend);
     this.activeTab = CHATS_IDX;
@@ -191,9 +195,8 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.rooms.push(roomContainer);
         this.switchToChat(roomContainer)
       } else {
-        this.activeRoom.room.members.push(friend.id);
-        this.activeRoom.accounts.set(friend.id, friend);
-        this.chat.send(new Message(this.activeRoom.room.id, this.profile.id, '', Date.now(), 'update'))
+        // this.activeRoom.room.members.push(friend.id);
+        // this.activeRoom.accounts.set(friend.id, friend);
       }
     }, (error) => {
       this.activeRoom.loading = false;

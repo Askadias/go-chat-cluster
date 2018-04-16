@@ -1,21 +1,46 @@
 <div class="room {{className}}" *ngIf="_room">
-  <mat-toolbar color="accent" class="room-toolbar">
-    <button *ngIf="isMobile" class="flat-button md-36" (click)="back.emit($event)">
-      <mat-icon class="md-36">arrow_back</mat-icon>
-    </button>
-    <button class="flat-button md-36 room-menu" [matMenuTriggerFor]="menu">
-      <mat-icon>more_vert</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="close.emit($event)">
-        <mat-icon>close</mat-icon>
-        <span>Close Chat</span>
+  <mat-toolbar color="accent" class="room-toolbar" fxLayout="row" fxLayoutAlign="space-between center">
+    <div>
+      <button *ngIf="isMobile" class="flat-button md-36" (click)="back.emit($event)">
+        <mat-icon class="md-36">arrow_back</mat-icon>
       </button>
-      <button mat-menu-item (click)="dismiss.emit($event)">
-        <mat-icon>delete_forever</mat-icon>
-        <span>Exit and Remove History</span>
+    </div>
+    <div class="room-members" fxLayout="row" *ngIf="_room.room.members.length <= 2">
+      <chat-person *ngFor="let memberId of _room.room.members | skipOwnFilter:_room.me.id"
+                   [person]="_room.getUser(memberId)">
+      </chat-person>
+    </div>
+    <div class="room-members" fxLayout="row" *ngIf="_room.room.members.length > 2">
+      <chat-person *ngFor="let memberId of _room.room.members | skipOwnFilter:_room.me.id"
+                   [matMenuTriggerFor]="member_menu"
+                   [person]="_room.getUser(memberId)">
+        <mat-menu #member_menu="matMenu">
+          <button mat-menu-item (click)="startChat.emit({memberId: memberId})">
+            <mat-icon>chat</mat-icon>
+            <span>To Private Chat</span>
+          </button>
+          <button mat-menu-item (click)="_room.kickMember(memberId)">
+            <mat-icon>close</mat-icon>
+            <span>Kick Member</span>
+          </button>
+        </mat-menu>
+      </chat-person>
+    </div>
+    <div>
+      <button class="flat-button md-36" [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
       </button>
-    </mat-menu>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="close.emit($event)">
+          <mat-icon>close</mat-icon>
+          <span>Close Chat</span>
+        </button>
+        <button mat-menu-item (click)="dismiss.emit($event)">
+          <mat-icon>delete_forever</mat-icon>
+          <span>Exit and Remove History</span>
+        </button>
+      </mat-menu>
+    </div>
   </mat-toolbar>
   <div class="room-bg"></div>
   <div class="chat-log-container">
@@ -40,7 +65,7 @@
           <div class="chat-message-text" [innerHtml]="message.body | newline">
           </div>
           <div class="chat-message-timestamp" *ngIf="isHeadMessage(message, i)">
-              {{ getTimestamp(message) | date:'medium' }}
+            {{ getTimestamp(message) | date:'medium' }}
           </div>
         </div>
       </div>
