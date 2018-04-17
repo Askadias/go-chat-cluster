@@ -105,6 +105,8 @@ type MongoConf struct {
   RoomCollectionName string `default:"rooms"`
   // Collection name for storing chat log
   MessagesCollectionName string `default:"messages"`
+  // Collection name for storing member info
+  MemberInfoCollectionName string `default:"member-info"`
 }
 
 func init() {

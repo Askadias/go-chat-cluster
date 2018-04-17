@@ -147,7 +147,6 @@ func DeleteRoom(
 func AddRoomMember(
   params martini.Params,
   req *http.Request,
-  res http.ResponseWriter,
   render render.Render,
   chatService *services.Chat,
   friendsService services.Friends,
@@ -214,8 +213,8 @@ func SendMessage(
     profileID := claims["jti"].(string)
     roomID := params["id"]
 
-    message.From = profileID
-    message.Room = roomID
+    message.FromID = profileID
+    message.RoomID = roomID
     if newMessage, err := chatService.AddMessage(message); err != nil {
       render.JSON(err.HttpCode, err)
     } else {
@@ -258,6 +257,70 @@ func GetChatLog(
       render.JSON(err.HttpCode, err)
     } else {
       render.JSON(http.StatusOK, messages)
+    }
+  } else {
+    render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
+  }
+}
+
+// Returns all members info for a given chat room
+func GetAllMembersInfo(
+  req *http.Request,
+  params martini.Params,
+  render render.Render,
+  chatService *services.Chat,
+) {
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
+  if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
+    profileID := claims["jti"].(string)
+    roomID := params["id"]
+    if memberInfos, err := chatService.GetAllMembersInfo(profileID, roomID); err != nil {
+      render.JSON(err.HttpCode, err)
+    } else {
+      render.JSON(http.StatusOK, memberInfos)
+    }
+  } else {
+    render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
+  }
+}
+
+// Returns room member info
+func GetMemberInfo(
+  params martini.Params,
+  req *http.Request,
+  render render.Render,
+  chatService *services.Chat,
+) {
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
+  if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
+    profileID := claims["jti"].(string)
+    roomID := params["id"]
+    if memberInfo, err := chatService.GetMemberInfo(profileID, roomID); err != nil {
+      render.JSON(err.HttpCode, err)
+    } else {
+      render.JSON(http.StatusOK, memberInfo)
+    }
+  } else {
+    render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
+  }
+}
+
+// Updates room messages last read time fo a given member
+func UpdateMemberLastReadTime(
+  params martini.Params,
+  req *http.Request,
+  res http.ResponseWriter,
+  render render.Render,
+  chatService *services.Chat,
+) {
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
+  if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
+    profileID := claims["jti"].(string)
+    roomID := params["id"]
+    if err := chatService.UpdateLastReadTime(profileID, roomID); err != nil {
+      render.JSON(err.HttpCode, err)
+    } else {
+      res.WriteHeader(http.StatusNoContent)
     }
   } else {
     render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)

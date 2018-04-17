@@ -138,3 +138,24 @@ a, button, input, mat-checkbox, mat-icon {
 .material-icons {
   vertical-align: middle;
 }
+
+.mat-menu-panel {
+  background-color: #2a2a2a;
+  .mat-menu-content {
+    padding: 0;
+    .mat-menu-item {
+      color: white;
+      .mat-icon {
+        color: white;
+      }
+      &:hover {
+        background-color: #333;
+      }
+    }
+  }
+}
+
+.mat-dialog-container {
+  background-color: #333;
+  color: white;
+}

@@ -50,15 +50,12 @@
         <ng-template mat-tab-label>
           <mat-icon class="md-36">chat_bubble</mat-icon>
         </ng-template>
-        <div class="chat-groups">
-          <div class="chat-group" *ngFor="let chat of rooms" [class.active]="isActiveChat(chat)" fxLayout="column">
-            <div *ngIf="chat.loading">
-              <mat-spinner class="loading-members"></mat-spinner>
-            </div>
-            <chat-group [roomContainer]="chat" [profile]="profile"
-                        (click)="switchToChat(chat);isMobile()?snav.close():true">
-            </chat-group>
-          </div>
+        <div class="chat-groups" fxLayout="column">
+          <chat-group *ngFor="let chat of rooms" class="chat-group"
+                      [roomContainer]="chat" [profile]="profile"
+                      [active]="isActiveChat(chat)"
+                      (click)="switchToChat(chat);isMobile()?snav.close():true">
+          </chat-group>
         </div>
       </mat-tab>
     </mat-tab-group>
@@ -78,6 +75,6 @@
                (startChat)="onStartChat($event)"
                (back)="snav.open()"
                (close)="closeChat()"
-               (dismiss)="dismissChat(activeRoom)"></chat-room>
+               (delete)="dismissChat(activeRoom)"></chat-room>
   </mat-sidenav-content>
 </mat-sidenav-container>

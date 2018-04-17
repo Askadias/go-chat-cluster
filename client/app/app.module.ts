@@ -21,10 +21,12 @@ import {AuthGuard} from "./login/auth.guard";
 import {AuthInterceptor} from "./login/auth-interceptor";
 import {CookieService} from "ngx-cookie-service";
 import {AuthenticatedGuard} from "./login/authenticated.guard";
+import {ConfirmDialog} from './common/confirm/confirm-dialog.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ConfirmDialog
   ],
   imports: [
     BrowserAnimationsModule,

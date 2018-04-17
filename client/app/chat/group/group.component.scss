@@ -4,16 +4,29 @@ $timings: ease-out;
 
 .group {
   position: relative;
-  transition: border .2s $timings, color .1s $timings, background .2s $timings, rotate3d 0.2s $timings;
+  transition: all 0.2s ease-in;
   text-align: left;
-  height: 52px;
+  height: 62px;
   margin: 0;
+  padding: 4px 0;
   cursor: pointer;
   color: #969696;
   background: none center center no-repeat;
   background-size: cover;
   display: block;
   width: 100%;
+  overflow: hidden;
+
+  &.active {
+    border-left: transparent;
+    background-color: #2a2a2a;
+  }
+  &:hover{
+    background-color: #333;
+  }
+  .loading-members {
+    margin: auto;
+  }
 
   .group-link {
     position: relative;

@@ -13,15 +13,17 @@
     <div class="room-members" fxLayout="row" *ngIf="_room.room.members.length > 2">
       <chat-person *ngFor="let memberId of _room.room.members | skipOwnFilter:_room.me.id"
                    [matMenuTriggerFor]="member_menu"
-                   [person]="_room.getUser(memberId)" [compact]="isTablet || _room.room.members.length > 4">
+                   [person]="_room.getUser(memberId)"
+                   [compact]="isTablet || _room.room.members.length > 4"
+                   class="room-member">
         <mat-menu #member_menu="matMenu">
           <button mat-menu-item (click)="startChat.emit({memberId: memberId})">
             <mat-icon>chat</mat-icon>
-            <span>To Private Chat</span>
+            <span>Private Chat</span>
           </button>
-          <button mat-menu-item (click)="_room.kickMember(memberId)">
+          <button mat-menu-item (click)="_room.kickMember(memberId)" *ngIf="isOwner()">
             <mat-icon>close</mat-icon>
-            <span>Kick Member</span>
+            <span>Remove Member</span>
           </button>
         </mat-menu>
       </chat-person>
@@ -35,7 +37,7 @@
           <mat-icon>close</mat-icon>
           <span>Close Chat</span>
         </button>
-        <button mat-menu-item (click)="dismiss.emit($event)">
+        <button mat-menu-item (click)="delete.emit($event)">
           <mat-icon>delete_forever</mat-icon>
           <span>Exit and Remove History</span>
         </button>

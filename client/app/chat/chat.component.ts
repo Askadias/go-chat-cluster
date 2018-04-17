@@ -9,7 +9,8 @@ import {RoomContainer} from "../domain/room-container";
 import {Message} from "../domain/message";
 import {MediaMatcher} from '@angular/cdk/layout';
 import {exponentialBackOff} from "../common/utils";
-import {MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatTabChangeEvent} from "@angular/material";
+import {ConfirmDialog} from "../common/confirm/confirm-dialog.component";
 
 const FRIENDS_IDX = 0;
 const CHATS_IDX = 1;
@@ -39,6 +40,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   activeTab = CHATS_IDX;
 
   constructor(public route: ActivatedRoute,
+              public confirmDialog: MatDialog,
               private auth: AuthService,
               private chat: ChatService,
               changeDetectorRef: ChangeDetectorRef,
@@ -241,15 +243,24 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   dismissChat(roomContainer: RoomContainer) {
-    this.loadingRooms = true;
-    this.chat.deleteRoom(roomContainer.room.id).subscribe(() => {
-        this.loadingRooms = false;
-        // this.removeRoomFromPool(roomContainer.room.id);
-      }, (error) => {
-        this.loadingRooms = false;
-        this.errors = [error.message];
+    let confirmDialogRef = this.confirmDialog.open(ConfirmDialog, {
+      width: '320px',
+      data: { message: "Are you sure you want to delete the chat room and its conversation history?" }
+    });
+
+    confirmDialogRef.afterClosed().subscribe(confirm => {
+      if (confirm) {
+        this.loadingRooms = true;
+        this.chat.deleteRoom(roomContainer.room.id).subscribe(() => {
+            this.loadingRooms = false;
+            // this.removeRoomFromPool(roomContainer.room.id);
+          }, (error) => {
+            this.loadingRooms = false;
+            this.errors = [error.message];
+          }
+        )
       }
-    )
+    });
   }
 
   removeRoomFromPool(roomId) {

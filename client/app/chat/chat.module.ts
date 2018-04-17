@@ -15,6 +15,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatMenuModule} from '@angular/material/menu';
+import {MatDialogModule} from '@angular/material/dialog'
 import {ChatComponent} from './chat.component';
 import {SidebarComponent} from "../common/sidebar/sidebar.component";
 import {PersonComponent} from "./person/person.component";
@@ -27,7 +28,8 @@ import {EmojiModule} from '@ctrl/ngx-emoji-mart/ngx-emoji'
 import {NgxWigModule} from 'ngx-wig';
 import {NewlinePipe} from "./room/newline.pipe";
 import {MediaMatcher} from "@angular/cdk/layout";
-import { GroupComponent } from './group/group.component';
+import {GroupComponent} from './group/group.component';
+import {ConfirmDialog} from "../common/confirm/confirm-dialog.component";
 
 
 @NgModule({
@@ -57,6 +59,7 @@ import { GroupComponent } from './group/group.component';
     MatToolbarModule,
     MatTabsModule,
     MatMenuModule,
+    MatDialogModule,
     HttpClientModule,
     HttpClientXsrfModule,
     PickerModule,
@@ -65,6 +68,9 @@ import { GroupComponent } from './group/group.component';
   ],
   providers: [
     MediaMatcher
+  ],
+  entryComponents: [
+    ConfirmDialog
   ]
 })
 export class ChatModule {

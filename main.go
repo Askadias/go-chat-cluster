@@ -75,7 +75,7 @@ func main() {
     Timeout: conf.Facebook.Timeout,
   })
   chatDB := db.NewMongoChat(conf.Mongo)
-  chat := services.NewChat(conf.Chat, chatDB, chatDB, cache, connectionManager)
+  chat := services.NewChat(conf.Chat, chatDB, chatDB, chatDB, cache, connectionManager)
   m.Map(chat)
   m.MapTo(facebook, (*services.OAuth)(nil))
   m.MapTo(facebook, (*services.Account)(nil))
@@ -92,6 +92,9 @@ func main() {
     r.Post("/rooms", binding.Bind(models.Room{}), jwtMiddleware.CheckJWT, controllers.CreateRoom)
     r.Get("/rooms/:id", jwtMiddleware.CheckJWT, controllers.GetRoom)
     r.Delete("/rooms/:id", jwtMiddleware.CheckJWT, controllers.DeleteRoom)
+    r.Get("/rooms/:id/members/info", jwtMiddleware.CheckJWT, controllers.GetAllMembersInfo)
+    r.Get("/rooms/:id/members/:memberID/info", jwtMiddleware.CheckJWT, controllers.GetMemberInfo)
+    r.Put("/rooms/:id/members/:memberID/info", jwtMiddleware.CheckJWT, controllers.UpdateMemberLastReadTime)
     r.Post("/rooms/:id/members/:memberID", jwtMiddleware.CheckJWT, controllers.AddRoomMember)
     r.Delete("/rooms/:id/members/:memberID", jwtMiddleware.CheckJWT, controllers.RemoveRoomMember)
     r.Get("/rooms/:id/log", jwtMiddleware.CheckJWT, controllers.GetChatLog)

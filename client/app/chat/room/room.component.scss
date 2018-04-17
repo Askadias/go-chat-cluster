@@ -11,10 +11,8 @@
   position: absolute;
   .room-toolbar {
     .room-members {
-      chat-person {
-        .person:hover {
-          background-color: transparent;
-        }
+      .room-member {
+        margin: 0 5px;
       }
     }
   }
@@ -241,11 +239,3 @@
     }
   }
 }
-
-//h3:first-child {
-//  margin-top: 0;
-//}
-//
-//p:last-child {
-//  margin-bottom: 0;
-//}

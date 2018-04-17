@@ -12,6 +12,7 @@ type Chat struct {
   chatConf          conf.ChatConf
   chatDB            db.Chat
   chatLogDB         db.ChatLog
+  memberInfoDB      db.MemberInfo
   roomCache         db.RoomCache
   connectionManager *ConnectionManager
 }
@@ -20,6 +21,7 @@ func NewChat(
   chatConf conf.ChatConf,
   chatDB db.Chat,
   chatLogDB db.ChatLog,
+  memberInfoDB db.MemberInfo,
   roomCache db.RoomCache,
   connectionManager *ConnectionManager,
 ) *Chat {
@@ -27,6 +29,7 @@ func NewChat(
     chatConf:          chatConf,
     chatDB:            chatDB,
     chatLogDB:         chatLogDB,
+    memberInfoDB:      memberInfoDB,
     roomCache:         roomCache,
     connectionManager: connectionManager,
   }
@@ -34,16 +37,23 @@ func NewChat(
 
 // Checks if user exceeds the maximum of opened chat rooms and creates a new room
 func (c *Chat) CreateRoom(profileID string, room models.Room) (*models.Room, *conf.ApiError) {
+  // Check for max opened rooms
   if count, err := c.chatDB.OpenedRoomsCount(profileID); err != nil {
     return nil, conf.NewApiError(err)
     if count > c.chatConf.MaxOpenedRooms {
       return nil, conf.ErrTooManyChatsOpened
     }
   }
-  log.Println("Creating new chat room for", profileID)
   if room, err := c.chatDB.CreateRoom(profileID, room); err != nil {
     return nil, err
   } else {
+
+    for _, memberID := range room.Members {
+      memberInfo := models.MemberInfo{RoomID: room.ID, MemberID: memberID}
+      if _, err := c.memberInfoDB.CreateMemberInfo(memberInfo); err != nil {
+        log.Println("Failed to store member info for memberID:", memberID, "roomID:", room.ID, "error:", err.Message)
+      }
+    }
     c.roomCache.PutRoom(room.ID, room)
     return room, nil
   }
@@ -51,13 +61,11 @@ func (c *Chat) CreateRoom(profileID string, room models.Room) (*models.Room, *co
 
 // Returns list of rooms that current user is member of
 func (c *Chat) GetRooms(profileID string) ([]models.Room, *conf.ApiError) {
-  log.Println("Retrieving chat rooms for", profileID)
   return c.chatDB.GetRooms(profileID)
 }
 
 // Returns a specific room by id where current user is member of
 func (c *Chat) GetRoom(profileID string, roomID string) (*models.Room, *conf.ApiError) {
-  log.Println("Retrieving chat room", roomID, "by", profileID)
   if room, err := c.roomCache.GetRoom(roomID); err != nil {
     if room, err := c.chatDB.GetRoom(profileID, roomID); err != nil {
       return nil, err
@@ -77,7 +85,7 @@ func (c *Chat) DeleteRoom(profileID string, roomID string) *conf.ApiError {
     return err
   } else {
     // if not an owner then exit this room
-    if room.Owner != profileID {
+    if room.OwnerID != profileID {
       log.Println("Exiting chat room", roomID, "by member", profileID)
       if err := c.chatDB.RemoveRoomMember(roomID, profileID); err != nil {
         return err
@@ -85,13 +93,12 @@ func (c *Chat) DeleteRoom(profileID string, roomID string) *conf.ApiError {
         return nil
       }
     }
-    log.Println("Deleting chat room", roomID, "by owner", profileID)
     if err := c.chatDB.DeleteRoom(roomID); err != nil {
       return err
     } else {
       c.roomCache.EvictRoom(roomID)
       c.connectionManager.Broadcast <- &BroadcastPackage{
-        Message:  &models.Message{Type: "update", Room: roomID},
+        Message:  &models.Message{Type: "update", RoomID: roomID},
         Auditory: room.Members,
       }
       return nil
@@ -119,9 +126,13 @@ func (c *Chat) AddRoomMember(profileID string, roomID string, memberID string) (
     if err := c.chatDB.AddRoomMember(roomID, memberID); err != nil {
       return nil, err
     }
+    memberInfo := models.MemberInfo{RoomID: room.ID, MemberID: memberID}
+    if _, err := c.memberInfoDB.CreateMemberInfo(memberInfo); err != nil {
+      log.Println("Failed to store member info for memberID:", memberID, "roomID:", room.ID, "error:", err.Message)
+    }
     c.roomCache.PutRoom(roomID, room) // TODO concurrency check
     c.connectionManager.Broadcast <- &BroadcastPackage{
-      Message:  &models.Message{Type: "update", Room: roomID},
+      Message:  &models.Message{Type: "update", RoomID: roomID},
       Auditory: append(room.Members, memberID),
     }
     return room, nil
@@ -143,12 +154,14 @@ func (c *Chat) RemoveRoomMember(profileID string, roomID string, memberID string
   if room, err := c.GetRoom(profileID, roomID); err != nil {
     return err
   } else {
-    if room.Owner != profileID {
+    if room.OwnerID != profileID {
       return conf.ErrNotAnOwner
     }
-    log.Println("Remove member", memberID, "from room", roomID, "by", profileID)
     if err := c.chatDB.RemoveRoomMember(roomID, memberID); err != nil {
       return err
+    }
+    if err := c.memberInfoDB.DeleteMemberInfo(roomID, memberID); err != nil {
+      log.Println("Failed to remove member info for memberID:", memberID, "roomID:", room.ID, "error:", err.Message)
     }
     room.Updated = models.Timestamp(time.Now())
     if len(room.Members) <= 2 {
@@ -156,13 +169,16 @@ func (c *Chat) RemoveRoomMember(profileID string, roomID string, memberID string
         return err
       } else {
         c.roomCache.EvictRoom(roomID)
+        if err := c.memberInfoDB.DeleteAllMembersInfo(roomID); err != nil {
+          log.Println("Failed to cleanup member info for roomID:", room.ID, "error:", err.Message)
+        }
       }
     } else {
       c.roomCache.EvictRoom(roomID)
-      //c.roomCache.PutRoom(roomID, room)
+      //c.roomCache.PutRoom(roomID, room) TODO verify cache updates properly
     }
     c.connectionManager.Broadcast <- &BroadcastPackage{
-      Message:  &models.Message{Type: "update", Room: roomID},
+      Message:  &models.Message{Type: "update", RoomID: roomID},
       Auditory: append(room.Members, memberID),
     }
     return nil
@@ -172,14 +188,13 @@ func (c *Chat) RemoveRoomMember(profileID string, roomID string, memberID string
 // Adds new message to the chat log
 // Additionally checks that current user is a member of that chat room.
 func (c *Chat) AddMessage(message models.Message) (*models.Message, *conf.ApiError) {
-  if err := c.chatDB.IsRoomMember(message.Room, message.From); err != nil {
+  if err := c.chatDB.IsRoomMember(message.RoomID, message.FromID); err != nil {
     return nil, err
   }
-  log.Println("Log message from", message.From, "to room", message.Room)
   if message, err := c.chatLogDB.AddMessage(message); err != nil {
     return nil, err
   } else {
-    if room, err := c.GetRoom(message.From, message.Room); err != nil {
+    if room, err := c.GetRoom(message.FromID, message.RoomID); err != nil {
       return nil, err
     } else {
       c.connectionManager.Broadcast <- &BroadcastPackage{Message: message, Auditory: room.Members}
@@ -193,7 +208,6 @@ func (c *Chat) GetMessages(profileID string, roomID string, from time.Time, limi
   if err := c.chatDB.IsRoomMember(roomID, profileID); err != nil {
     return nil, err
   }
-  log.Println("Retrieving chat log from:", from, "limit:", limit, "room:", roomID, "member:", profileID)
   return c.chatLogDB.GetMessages(profileID, roomID, from, limit)
 }
 
@@ -202,12 +216,36 @@ func (c *Chat) AddReaction(profileID string, roomID string, messageID string, re
   if err := c.chatDB.IsRoomMember(roomID, profileID); err != nil {
     return err
   }
-  log.Println("Adding reacion", reaction, "to a message", messageID, "by", profileID)
   return c.chatLogDB.AddReaction(profileID, messageID, reaction)
 }
 
 // Modifies the specific message
 func (c *Chat) EditMessage(profileID string, messageID string, body string) *conf.ApiError {
-  log.Println("Editing message:", messageID, "by", profileID)
   return c.chatLogDB.EditMessage(profileID, messageID, body)
+}
+
+// Updates last read time for a given chat member
+func (c *Chat) UpdateLastReadTime(profileID string, roomID string) *conf.ApiError {
+  if err := c.memberInfoDB.UpdateLastReadTime(roomID, profileID); err != nil {
+    log.Println("Failed to update member info for memberID:", profileID, "roomID:", roomID, "error:", err.Message)
+    return err
+  } else {
+    return nil
+  }
+}
+
+// Returns all chat members info
+func (c *Chat) GetAllMembersInfo(profileID string, roomID string) ([]models.MemberInfo, *conf.ApiError) {
+  if err := c.chatDB.IsRoomMember(roomID, profileID); err != nil {
+    return nil, err
+  }
+  return c.memberInfoDB.GetAllMembersInfo(roomID)
+}
+
+// Returns chat member info
+func (c *Chat) GetMemberInfo(profileID string, roomID string) (*models.MemberInfo, *conf.ApiError) {
+  if err := c.chatDB.IsRoomMember(roomID, profileID); err != nil {
+    return nil, err
+  }
+  return c.memberInfoDB.GetMemberInfo(roomID, profileID)
 }

@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Message} from "../domain/message";
 import {Room} from "../domain/room";
+import {MemberInfo} from "../domain/member-info";
 
 @Injectable()
 export class ChatService {
@@ -36,6 +37,18 @@ export class ChatService {
 
   getRooms(): Observable<Room[]> {
     return this.http.get<Room[]>(`/api/rooms`);
+  }
+
+  getAllMembersInfo(roomId: string): Observable<MemberInfo[]> {
+    return this.http.get<MemberInfo[]>(`/api/rooms/${roomId}/members/info`);
+  }
+
+  getlMemberInfo(roomId: string, memberId: string): Observable<MemberInfo> {
+    return this.http.get<MemberInfo>(`/api/rooms/${roomId}/members/${memberId}/info`);
+  }
+
+  updateLastReadTime(roomId: string, memberId: string): Observable<any> {
+    return this.http.put<any>(`/api/rooms/${roomId}/members/${memberId}/info`, {});
   }
 
   getRoom(roomId: string): Observable<Room> {

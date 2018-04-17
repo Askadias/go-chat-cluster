@@ -18,7 +18,7 @@ export class RoomComponent implements OnInit {
   @Input() isTablet = false;
   @Output() back: EventEmitter<any> = new EventEmitter<any>();
   @Output() close: EventEmitter<any> = new EventEmitter<any>();
-  @Output() dismiss: EventEmitter<any> = new EventEmitter<any>();
+  @Output() delete: EventEmitter<any> = new EventEmitter<any>();
   @Output() startChat: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('chatLogElement') private chatLogContainer: ElementRef;
@@ -156,5 +156,9 @@ export class RoomComponent implements OnInit {
 
   trackByMessageId(index: number, message: Message): string {
     return message.id;
+  }
+
+  isOwner() {
+    return this._room.amIOwner()
   }
 }

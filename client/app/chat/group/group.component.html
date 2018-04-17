@@ -3,6 +3,9 @@
      [class.active]="active"
      fxLayout="row"
      fxLayoutAlign="space-between center">
+  <div *ngIf="roomContainer.loading" class="loading-members">
+    <mat-spinner [diameter]="52"></mat-spinner>
+  </div>
   <a (click)="click.emit($event)"
      class="group-link"
      fxLayout="row"
