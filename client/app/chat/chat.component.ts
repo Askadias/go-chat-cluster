@@ -196,9 +196,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   addMember(friend: User) {
-    this.activeRoom.loading = true;
     this.chat.addMember(this.activeRoom.room.id, friend.id).subscribe((room) => {
-      this.activeRoom.loading = false;
       if (room.id != this.activeRoom.room.id) {
         const roomContainer = new RoomContainer(this.profile, room, this.auth, this.chat);
         this.rooms.push(roomContainer);
@@ -208,7 +206,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         // this.activeRoom.accounts.set(friend.id, friend);
       }
     }, (error) => {
-      this.activeRoom.loading = false;
       this.errors = [error.message];
     })
   }
