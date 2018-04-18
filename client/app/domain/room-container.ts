@@ -112,13 +112,10 @@ export class RoomContainer {
   }
 
   kickMember(userId: string) {
-    this.loading = true;
     this.chat.kickMember(this.room.id, userId).subscribe(() => {
-      this.loading = false;
       this.room.members.slice(this.room.members.indexOf(userId), 1);
       this.chat.send(new Message(this.room.id, this.me.id, '', Date.now(), 'update'))
     }, (error) => {
-      this.loading = false;
       this.errors = [error.message];
     })
   }
