@@ -7,6 +7,7 @@
     <mat-spinner [diameter]="52"></mat-spinner>
   </div>
   <a (click)="click.emit($event)"
+     *ngIf="!roomContainer.loading"
      class="group-link"
      fxLayout="row"
      fxLayoutAlign="start center">
@@ -29,6 +30,7 @@
     </div>
   </a>
   <div class="group-controls"
+       *ngIf="!roomContainer.loading"
        fxLayout="row"
        fxLayoutAlign="end center"
        fxFlex>
