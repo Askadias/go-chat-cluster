@@ -24,8 +24,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {FriendsFilterPipe} from "./friends-filter.pipe";
 import {SkipOwnFilterPipe} from "./skip-own-filter.pipe";
 import {PickerModule} from "@ctrl/ngx-emoji-mart";
-import {EmojiModule} from '@ctrl/ngx-emoji-mart/ngx-emoji'
-import {NgxWigModule} from 'ngx-wig';
+import {EmojiModule} from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import {NewlinePipe} from "./room/newline.pipe";
 import {MediaMatcher} from "@angular/cdk/layout";
 import {GroupComponent} from './group/group.component';
@@ -63,8 +62,7 @@ import {ConfirmDialog} from "../common/confirm/confirm-dialog.component";
     HttpClientModule,
     HttpClientXsrfModule,
     PickerModule,
-    EmojiModule,
-    NgxWigModule
+    EmojiModule
   ],
   providers: [
     MediaMatcher
