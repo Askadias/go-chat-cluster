@@ -16,7 +16,7 @@
                    [person]="_room.getUser(memberId)"
                    [compact]="isTablet || _room.room.members.length > 4"
                    class="room-member">
-        <mat-menu #member_menu="matMenu">
+        <mat-menu #member_menu="matMenu" yPosition="below" [overlapTrigger]="false">
           <button mat-menu-item (click)="startChat.emit({memberId: memberId})">
             <mat-icon>chat</mat-icon>
             <span>Private Chat</span>
@@ -32,7 +32,7 @@
       <button class="flat-button md-36" [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
       </button>
-      <mat-menu #menu="matMenu">
+      <mat-menu #menu="matMenu" yPosition="below" xPosition="before" [overlapTrigger]="false">
         <button mat-menu-item (click)="close.emit($event)">
           <mat-icon>close</mat-icon>
           <span>Close Chat</span>
