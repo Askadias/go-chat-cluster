@@ -73,7 +73,7 @@
       </div>
     </div>
   </div>
-  <button mat-fab *ngIf="showScrollDown" (click)="scrollDown()" class="scroll-down-btn">
+  <button mat-fab *ngIf="showScrollDown" (click)="scrollDown()" class="scroll-down-btn" [@scaleAnimation]>
     <mat-icon aria-label="Scroll Down">keyboard_arrow_down</mat-icon>
   </button>
   <div class="chat-input">

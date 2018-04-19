@@ -12,12 +12,12 @@
       <div class="avatar-container"
            *ngFor="let memberId of roomContainer.room.members | skipOwnFilter:profile.id; let i=index"
            fxFlex="48px">
-        <div *ngIf="i < 3 && roomContainer.getUser(memberId)">
+        <div *ngIf="i < 3 && roomContainer.getUser(memberId)" class="avatar">
           <img src="{{ roomContainer.getUser(memberId).avatarUrl }}"
-               class="avatar"
+               class="avatar-img"
                *ngIf="roomContainer.getUser(memberId).avatarUrl; else defaultAvatar"/>
           <ng-template #defaultAvatar>
-            <img src="../../../assets/img/avatars/default-avatar.png" class="avatar"/>
+            <img src="../../../assets/img/avatars/default-avatar.png" class="avatar-img"/>
           </ng-template>
         </div>
       </div>

@@ -9,16 +9,14 @@
      fxLayoutAlign="start center">
     <div class="avatar-container" fxFlex="48px">
       <img src="{{ person.avatarUrl }}"
-           class="avatar"
+           class="avatar-img"
            *ngIf="person.avatarUrl; else defaultAvatar"/>
       <ng-template #defaultAvatar>
-        <img src="../../../assets/img/avatars/default-avatar.png" class="avatar"/>
+        <img src="../../../assets/img/avatars/default-avatar.png" class="avatar-img"/>
       </ng-template>
     </div>
-    <div *ngIf="!compact"
-         class="person-name"
-          [@scaleAnimation]>
-      {{ person.name }}
+    <div *ngIf="!compact" class="person-name" [@scaleAnimation]>
+    {{ person.name }}
     </div>
   </a>
   <div class="person-controls"

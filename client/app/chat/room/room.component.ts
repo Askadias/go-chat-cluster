@@ -5,11 +5,13 @@ import {RoomContainer} from "../../domain/room-container";
 import {environment as env} from "../../../environments/environment";
 import {EmojiEvent} from "@ctrl/ngx-emoji-mart/ngx-emoji";
 import {ChatService} from "../../services/chat.service";
+import {scaleAnimation} from "../../animations/scale.animation";
 
 @Component({
   selector: 'chat-room',
   templateUrl: './room.component.html',
-  styleUrls: ['./room.component.scss']
+  styleUrls: ['./room.component.scss'],
+  animations: [scaleAnimation]
 })
 export class RoomComponent implements OnInit {
 
