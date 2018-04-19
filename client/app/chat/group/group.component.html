@@ -3,6 +3,7 @@
      [class.active]="active"
      fxLayout="row"
      fxLayoutAlign="space-between center">
+  <chat-loader *ngIf="roomContainer.loading"></chat-loader>
   <a (click)="click.emit($event)"
      class="group-link"
      fxLayout="row"
@@ -25,7 +26,6 @@
     {{ roomContainer.getName() }}
     </div>
   </a>
-  <chat-loader *ngIf="roomContainer.loading"></chat-loader>
   <div class="group-controls"
        *ngIf="!roomContainer.loading"
        fxLayout="row"

@@ -78,6 +78,7 @@
   </button>
   <div class="chat-input">
     <form class="chat-form" fxLayout="row" fxLayoutAlign="space-between center" (keydown)="sendOnEnter($event)">
+      <chat-loader *ngIf="loading"></chat-loader>
       <mat-form-field class="chat-input-field">
         <textarea matInput id="message" name="message" placeholder="Message"
                   matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="2"
