@@ -10,11 +10,14 @@ import (
   "time"
   "github.com/Jeffail/tunny"
   "github.com/gorilla/websocket"
+  "github.com/Askadias/go-chat-cluster/middleware"
 )
 
+// Connection DTO for channel
 type Connection struct {
-  UserID string
-  Socket *websocket.Conn
+  UserID   string              // abstract user ID
+  DeviceID middleware.DeviceID // user device ID to support chats opened on several devices
+  Socket   *websocket.Conn     // socket connection for incoming messages and notifications
 }
 
 type BroadcastPackage struct {
@@ -28,7 +31,7 @@ type MessageJob struct {
 }
 
 type ConnectionManager struct {
-  Connections map[string]*websocket.Conn
+  Connections map[string]map[middleware.DeviceID]*websocket.Conn
   Register    chan *Connection
   Unregister  chan *Connection
   Broadcast   chan *BroadcastPackage
@@ -43,7 +46,7 @@ func NewConnectionManager(bus db.Bus, socketConf conf.SocketConf) *ConnectionMan
     Register:    make(chan *Connection),
     Unregister:  make(chan *Connection),
     Broadcast:   make(chan *BroadcastPackage),
-    Connections: make(map[string]*websocket.Conn),
+    Connections: make(map[string]map[middleware.DeviceID]*websocket.Conn),
     socketConf:  socketConf,
     bus:         bus,
   }
@@ -63,10 +66,12 @@ func (m *ConnectionManager) broadcasting() {
   receiversPool := tunny.NewFunc(m.socketConf.ReceiversPoolSize, func(messageJob interface{}) interface{} {
     job := messageJob.(MessageJob)
     m.mutex.RLock()
-    if socket, ok := m.Connections[job.memberID]; ok {
-      if err := m.sendMessage(socket, job.message); err != nil {
-        log.Println("Unable to deliver message to user", job.memberID)
-        m.Unregister <- &Connection{job.memberID, m.Connections[job.memberID]}
+    if devices, ok := m.Connections[job.memberID]; ok {
+      for deviceID, socket := range devices {
+        if err := m.sendMessage(socket, job.message); err != nil {
+          log.Println("Unable to deliver message to user", job.memberID)
+          m.Unregister <- &Connection{job.memberID, deviceID, socket}
+        }
       }
     } else {
       log.Println("Unable to deliver message to disconnected user", job.memberID)
@@ -83,7 +88,10 @@ func (m *ConnectionManager) broadcasting() {
         log.Println("Unable to connect user:", conn.UserID)
       } else {
         m.mutex.Lock()
-        m.Connections[conn.UserID] = conn.Socket
+        if _, ok := m.Connections[conn.UserID]; !ok {
+          m.Connections[conn.UserID] = make(map[middleware.DeviceID]*websocket.Conn)
+        }
+        m.Connections[conn.UserID][conn.DeviceID] = conn.Socket
         m.mutex.Unlock()
       }
     case conn := <-m.Unregister:
@@ -116,10 +124,12 @@ func (m *ConnectionManager) ping() {
   for {
     select {
     case <-ticker.C:
-      for userID, socket := range m.Connections {
-        if err := m.pingSocket(socket); err != nil {
-          log.Println("Failed to ping connection for user", userID)
-          m.Unregister <- &Connection{userID, socket}
+      for userID, devices := range m.Connections {
+        for deviceID, socket := range devices {
+          if err := m.pingSocket(socket); err != nil {
+            log.Println("Failed to ping connection for user", userID)
+            m.Unregister <- &Connection{userID, deviceID, socket}
+          }
         }
       }
     }

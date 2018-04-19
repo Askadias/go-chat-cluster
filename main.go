@@ -39,6 +39,7 @@ var redisCacheOptions = db.RedisCacheOptions{
 func main() {
   m := martini.New()
   // Add Logging
+  m.Use(middleware.Metadata())
   m.Use(middleware.Logger())
   // Add Compression
   m.Use(gzip.All())

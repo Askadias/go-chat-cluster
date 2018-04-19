@@ -111,11 +111,11 @@ func FromAuthHeader(r *http.Request) (string, error) {
 // FromJWTCookie is a "TokenExtractor" that takes a give request and extracts
 // the JWT token from the JWT cookie.
 func FromJWTCookie(r *http.Request) (string, error) {
-  authCookie, err := r.Cookie("JWT")
-  if err != nil {
+  if authCookie, err := r.Cookie("JWT"); err != nil {
     return "", err
+  } else {
+    return authCookie.Value, nil
   }
-  return authCookie.Value, nil
 }
 
 func (m *JWTMiddleware) CheckJWT(w http.ResponseWriter, c martini.Context, r *http.Request) {

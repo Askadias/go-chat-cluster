@@ -12,6 +12,7 @@ import (
   "time"
   "github.com/go-martini/martini"
   "strconv"
+  "github.com/Askadias/go-chat-cluster/middleware"
 )
 
 var upgrader = websocket.Upgrader{
@@ -26,6 +27,7 @@ func ConnectToChat(
   res http.ResponseWriter,
   render render.Render,
   manager *services.ConnectionManager,
+  deviceID middleware.DeviceID,
 ) {
   tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
   if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
@@ -39,7 +41,7 @@ func ConnectToChat(
         socket.SetReadDeadline(time.Now().Add(conf.Socket.PongWait))
         return nil
       })
-      connection := &services.Connection{UserID: profileID, Socket: socket}
+      connection := &services.Connection{UserID: profileID, DeviceID: deviceID, Socket: socket}
       manager.Register <- connection
     }
   } else {
