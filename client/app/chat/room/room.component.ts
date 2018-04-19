@@ -30,6 +30,7 @@ export class RoomComponent implements OnInit {
   errors: string[] = [];
   emojiPickerOpened = false;
   initialized = false;
+  showScrollDown = false;
 
   constructor(private chat: ChatService) {
   }
@@ -88,6 +89,13 @@ export class RoomComponent implements OnInit {
     );
   }
 
+  scrollDown() {
+    setTimeout(() => {
+      const native = this.chatLogContainer.nativeElement;
+      native.scrollTop = native.scrollHeight;
+    });
+  }
+
   ngOnInit() {
   }
 
@@ -127,14 +135,16 @@ export class RoomComponent implements OnInit {
       && this._room.messages[index + 1].timestamp - this._room.messages[index].timestamp < env.chat.closeMessagesRangeSec;
   }
 
-  loadHistory() {
+  onScroll() {
+    const native = this.chatLogContainer.nativeElement;
     if (this.initialized && !this.loading) {
-      const native = this.chatLogContainer.nativeElement;
 
       if (native.scrollTop < 1) {
         this.loadMessages()
       }
     }
+
+    this.showScrollDown = native.scrollHeight - (native.scrollTop + native.clientHeight) > 300;
   }
 
   toggleEmojiPicker(): void {

@@ -47,7 +47,7 @@
   <div class="room-bg"></div>
   <div class="chat-log-container">
     <div class="chat-log">
-      <div class="chat-messages" #chatLogElement (scroll)="loadHistory()">
+      <div class="chat-messages" #chatLogElement (scroll)="onScroll()">
         <div class="loading-zone"></div>
         <div *ngFor="let message of _room.messages; trackBy: trackByMessageId; let i = index"
              class="chat-message"
@@ -73,6 +73,9 @@
       </div>
     </div>
   </div>
+  <button mat-fab *ngIf="showScrollDown" (click)="scrollDown()" class="scroll-down-btn">
+    <mat-icon aria-label="Scroll Down">keyboard_arrow_down</mat-icon>
+  </button>
   <div class="chat-input">
     <form class="chat-form" fxLayout="row" fxLayoutAlign="space-between center" (keydown)="sendOnEnter($event)">
       <mat-form-field class="chat-input-field">

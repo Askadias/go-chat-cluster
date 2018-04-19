@@ -38,13 +38,13 @@ export class RoomContainer {
 
   getName(): string {
     if (!this.room.alias) {
-      let name: string = 'Group Chat #' + this.room.id;
+      let name: string = '...............';
       let users = this.getMembers();
       if (users.length > 0) {
         name = users[0].name;
       }
       if (users.length > 1) {
-        name += ',' + users[0].name;
+        name += ',' + users[1].name;
       }
       if (users.length > 2) {
         name += ',...'

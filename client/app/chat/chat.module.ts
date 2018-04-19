@@ -29,6 +29,7 @@ import {NewlinePipe} from "./room/newline.pipe";
 import {MediaMatcher} from "@angular/cdk/layout";
 import {GroupComponent} from './group/group.component';
 import {ConfirmDialog} from "../common/confirm/confirm-dialog.component";
+import {LoaderComponent} from "../common/loader/loader.component";
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import {ConfirmDialog} from "../common/confirm/confirm-dialog.component";
     FriendsFilterPipe,
     SkipOwnFilterPipe,
     NewlinePipe,
-    GroupComponent
+    GroupComponent,
+    LoaderComponent
   ],
   imports: [
     CommonModule,
