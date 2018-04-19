@@ -37,8 +37,6 @@ $timings: ease-out;
       min-width: 48px;
       border-radius: 50%;
       background-size: cover;
-      border: 2px solid rgba(255, 255, 255, 0);
-      transition: all .2s $timings;
       display: block;
 
       .avatar {
@@ -50,7 +48,6 @@ $timings: ease-out;
     .person-name {
       vertical-align: middle;
       transition: all .2s $timings;
-      //min-width: 238px;
       &.extinguished {
         opacity: 0.2;
       }
