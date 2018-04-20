@@ -286,6 +286,25 @@ func GetAllMembersInfo(
   }
 }
 
+// Returns all chat member infos for a given member
+func GetAllRoomsInfo(
+  req *http.Request,
+  render render.Render,
+  chatService *services.Chat,
+) {
+  tkn := req.Context().Value(conf.System.JWTUserPropName).(*jwt.Token)
+  if claims, ok := tkn.Claims.(jwt.MapClaims); ok && tkn.Valid {
+    profileID := claims["jti"].(string)
+    if memberInfos, err := chatService.GetAllRoomsInfo(profileID); err != nil {
+      render.JSON(err.HttpCode, err)
+    } else {
+      render.JSON(http.StatusOK, memberInfos)
+    }
+  } else {
+    render.JSON(conf.ErrInvalidToken.HttpCode, conf.ErrInvalidToken)
+  }
+}
+
 // Returns room member info
 func GetMemberInfo(
   params martini.Params,

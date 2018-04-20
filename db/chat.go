@@ -7,8 +7,9 @@ import (
 
 type Chat interface {
   OpenedRoomsCount(memberID string) (int, *conf.ApiError)
-  CreateRoom(ownerID string, room models.Room) (*models.Room, *conf.ApiError)
+  CreateRoom(room models.Room) (*models.Room, *conf.ApiError)
   GetRooms(memberID string) ([]models.Room, *conf.ApiError)
+  GetRoomsIn(roomIDs []string) ([]models.Room, *conf.ApiError)
   GetRoom(memberID string, roomID string) (*models.Room, *conf.ApiError)
   DeleteRoom(roomID string) *conf.ApiError
   AddRoomMember(roomID string, memberID string) *conf.ApiError

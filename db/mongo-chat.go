@@ -53,12 +53,11 @@ func (c *MongoChat) OpenedRoomsCount(memberID string) (int, *conf.ApiError) {
 
 // Save new RoomID into the MongoDB by setting current profile ID as an owner.
 // Automatically adds current user to the chat room members.
-func (c *MongoChat) CreateRoom(ownerID string, room models.Room) (*models.Room, *conf.ApiError) {
+func (c *MongoChat) CreateRoom(room models.Room) (*models.Room, *conf.ApiError) {
   s := c.mongoSession.Clone()
   defer s.Close()
   db := s.DB(c.mongo.DBName)
 
-  room.OwnerID = ownerID
   room.ID = bson.NewObjectId().Hex()
   now := models.Timestamp(time.Now())
   room.Created = now
@@ -78,6 +77,19 @@ func (c *MongoChat) GetRooms(memberID string) ([]models.Room, *conf.ApiError) {
 
   var rooms []models.Room
   if err := db.C(c.mongo.RoomCollectionName).Find(bson.M{"members": memberID}).All(&rooms); err != nil {
+    return nil, conf.NewApiError(err)
+  }
+  return rooms, nil
+}
+
+// Returns all the ChatRooms by a given list of IDs
+func (c *MongoChat) GetRoomsIn(roomIDs []string) ([]models.Room, *conf.ApiError) {
+  s := c.mongoSession.Clone()
+  defer s.Close()
+  db := s.DB(c.mongo.DBName)
+
+  var rooms []models.Room
+  if err := db.C(c.mongo.RoomCollectionName).Find(bson.M{"_id": bson.M{"$in": roomIDs}}).All(&rooms); err != nil {
     return nil, conf.NewApiError(err)
   }
   return rooms, nil
@@ -211,8 +223,7 @@ func (c *MongoChat) IsRoomMember(roomID string, memberID string) *conf.ApiError 
     return conf.ErrInvalidId
   }
 
-  count, err := db.C(c.mongo.RoomCollectionName).Find(bson.M{"_id": roomID, "members": memberID}).Count()
-  if err != nil {
+  if count, err := db.C(c.mongo.RoomCollectionName).Find(bson.M{"_id": roomID, "members": memberID}).Count(); err != nil {
     return parseMongoDBError(err)
   } else if count == 0 {
     return conf.ErrNotAMember
@@ -292,7 +303,7 @@ func (c *MongoChat) CreateMemberInfo(memberInfo models.MemberInfo) (*models.Memb
   defer s.Close()
   db := s.DB(c.mongo.DBName)
 
-  if !bson.IsObjectIdHex(memberInfo.RoomID) || !bson.IsObjectIdHex(memberInfo.MemberID) {
+  if !bson.IsObjectIdHex(memberInfo.RoomID) {
     return nil, conf.ErrInvalidId
   }
 
@@ -313,7 +324,7 @@ func (c *MongoChat) GetMemberInfo(roomID string, memberID string) (*models.Membe
   defer s.Close()
   db := s.DB(c.mongo.DBName)
 
-  if !bson.IsObjectIdHex(roomID) || !bson.IsObjectIdHex(memberID) {
+  if !bson.IsObjectIdHex(roomID) {
     return nil, conf.ErrInvalidId
   }
 
@@ -324,7 +335,7 @@ func (c *MongoChat) GetMemberInfo(roomID string, memberID string) (*models.Membe
   return &memberInfo, nil
 }
 
-// Returns all the ChatRooms by a given member
+// Returns all the members metadata by a given roomID
 func (c *MongoChat) GetAllMembersInfo(roomID string) ([]models.MemberInfo, *conf.ApiError) {
   s := c.mongoSession.Clone()
   defer s.Close()
@@ -337,13 +348,26 @@ func (c *MongoChat) GetAllMembersInfo(roomID string) ([]models.MemberInfo, *conf
   return membersInfo, nil
 }
 
+// Returns all the rooms member metadata by a given memberID
+func (c *MongoChat) GetAllRoomsInfo(memberID string) ([]models.MemberInfo, *conf.ApiError) {
+  s := c.mongoSession.Clone()
+  defer s.Close()
+  db := s.DB(c.mongo.DBName)
+
+  var membersInfo []models.MemberInfo
+  if err := db.C(c.mongo.MemberInfoCollectionName).Find(bson.M{"member": memberID}).All(&membersInfo); err != nil {
+    return nil, conf.NewApiError(err)
+  }
+  return membersInfo, nil
+}
+
 // Updates Member Info last read time
 func (c *MongoChat) UpdateLastReadTime(roomID string, memberID string) *conf.ApiError {
   s := c.mongoSession.Clone()
   defer s.Close()
   db := s.DB(c.mongo.DBName)
 
-  if !bson.IsObjectIdHex(roomID) || !bson.IsObjectIdHex(memberID) {
+  if !bson.IsObjectIdHex(roomID) {
     return conf.ErrInvalidId
   }
 
@@ -362,7 +386,7 @@ func (c *MongoChat) DeleteMemberInfo(roomID string, memberID string) *conf.ApiEr
   defer s.Close()
   db := s.DB(c.mongo.DBName)
 
-  if !bson.IsObjectIdHex(roomID) || !bson.IsObjectIdHex(memberID) {
+  if !bson.IsObjectIdHex(roomID) {
     return conf.ErrInvalidId
   }
 

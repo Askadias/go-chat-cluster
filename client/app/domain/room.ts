@@ -1,14 +1,15 @@
 import {User} from './user';
+import {MemberInfo} from "./member-info";
 
 export class Room {
   id: string;
   alias?: string;
-  owner: string;
+  owner?: string;
   members: string[] = [];
+  memberInfo?: MemberInfo;
 
-  constructor(ownerId: string, userId: string) {
-    this.owner = ownerId;
-    this.members = [ownerId, userId];
+  constructor(currentUserId: string, userId: string) {
+    this.members = [currentUserId, userId];
   }
 
   addMember(newMember: User) {

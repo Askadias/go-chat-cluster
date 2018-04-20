@@ -93,6 +93,7 @@ func main() {
     r.Post("/rooms", binding.Bind(models.Room{}), jwtMiddleware.CheckJWT, controllers.CreateRoom)
     r.Get("/rooms/:id", jwtMiddleware.CheckJWT, controllers.GetRoom)
     r.Delete("/rooms/:id", jwtMiddleware.CheckJWT, controllers.DeleteRoom)
+    r.Get("/rooms/members/info", jwtMiddleware.CheckJWT, controllers.GetAllRoomsInfo)
     r.Get("/rooms/:id/members/info", jwtMiddleware.CheckJWT, controllers.GetAllMembersInfo)
     r.Get("/rooms/:id/members/:memberID/info", jwtMiddleware.CheckJWT, controllers.GetMemberInfo)
     r.Put("/rooms/:id/members/:memberID/info", jwtMiddleware.CheckJWT, controllers.UpdateMemberLastReadTime)

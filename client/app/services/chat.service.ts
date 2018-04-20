@@ -43,7 +43,11 @@ export class ChatService {
     return this.http.get<MemberInfo[]>(`/api/rooms/${roomId}/members/info`);
   }
 
-  getlMemberInfo(roomId: string, memberId: string): Observable<MemberInfo> {
+  getAllRoomsInfo(): Observable<MemberInfo[]> {
+    return this.http.get<MemberInfo[]>(`/api/rooms/members/info`);
+  }
+
+  getMemberInfo(roomId: string, memberId: string): Observable<MemberInfo> {
     return this.http.get<MemberInfo>(`/api/rooms/${roomId}/members/${memberId}/info`);
   }
 

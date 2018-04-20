@@ -12,4 +12,5 @@ type MemberInfo interface {
   UpdateLastReadTime(roomID string, memberID string) *conf.ApiError
   DeleteMemberInfo(roomID string, memberID string) *conf.ApiError
   DeleteAllMembersInfo(roomID string) *conf.ApiError
+  GetAllRoomsInfo(memberID string) ([]models.MemberInfo, *conf.ApiError)
 }

@@ -96,24 +96,32 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chat.getSocket().retryWhen(exponentialBackOff).subscribe((message: Message) => {
       if (message.room) {
         if (message.type === 'update') {
-          this.loadingRooms = false;
-          this.chat.getRoom(message.room).subscribe(
-            (room) => {
-              this.loadingRooms = false;
-              const roomContainer = new RoomContainer(this.profile, room, this.auth, this.chat);
-              const idx = this.rooms.findIndex(roomContainer =>
-                roomContainer.room.id === message.room
-              );
-              if (idx > -1) {
-                this.rooms[idx] = roomContainer;
-                if (this.activeRoom && this.activeRoom.room.id == room.id) {
-                  this.activeRoom = roomContainer;
+          this.chat.getMemberInfo(message.room, this.profile.id).subscribe(
+            memberInfo => {
+              this.chat.getRoom(memberInfo.room).subscribe(
+                (room) => {
+                  room.memberInfo = memberInfo;
+                  const roomContainer = new RoomContainer(this.profile, room, this.auth, this.chat);
+                  const idx = this.rooms.findIndex(roomContainer =>
+                    roomContainer.room.id === message.room
+                  );
+                  if (idx > -1) {
+                    this.rooms[idx] = roomContainer;
+                    if (this.activeRoom && this.activeRoom.room.id == room.id) {
+                      this.activeRoom = roomContainer;
+                    }
+                  } else {
+                    this.rooms.push(roomContainer);
+                  }
+                }, (error) => {
+                  if (error.status == 404) {
+                    this.removeRoomFromPool(message.room)
+                  } else {
+                    this.errors = [error.message];
+                  }
                 }
-              } else {
-                this.rooms.push(roomContainer);
-              }
-            }, (error) => {
-              this.loadingRooms = false;
+              )
+            },(error) => {
               if (error.status == 404) {
                 this.removeRoomFromPool(message.room)
               } else {
@@ -121,6 +129,7 @@ export class ChatComponent implements OnInit, OnDestroy {
               }
             }
           )
+
         } else {
           const targetChat = this.rooms.find((roomContainer) =>
             roomContainer.room.id === message.room
