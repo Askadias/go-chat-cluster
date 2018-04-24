@@ -114,7 +114,7 @@ export class ChatComponent implements OnInit, OnDestroy {
                     this.rooms.push(roomContainer);
                   }
                 }, (error) => {
-                  if (error.status == 404) {
+                  if (error.status == 403 || error.status == 404) {
                     this.removeRoomFromPool(message.room)
                   } else {
                     this.errors = [error.message];
@@ -122,7 +122,7 @@ export class ChatComponent implements OnInit, OnDestroy {
                 }
               )
             },(error) => {
-              if (error.status == 404) {
+              if (error.status == 403 || error.status == 404) {
                 this.removeRoomFromPool(message.room)
               } else {
                 this.errors = [error.message];

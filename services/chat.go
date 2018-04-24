@@ -104,31 +104,46 @@ func (c *Chat) DeleteRoom(profileID string, roomID string) *conf.ApiError {
   if room, err := c.GetRoom(profileID, roomID); err != nil {
     return err
   } else {
+    // 1. get all active room members to notify about the room membership update
     membersInfo, err := c.memberInfoDB.GetAllMembersInfo(roomID)
-    if err := c.memberInfoDB.DeleteMemberInfo(roomID, profileID); err != nil {
-      return err
-    }
-    defer c.broadcastRoomUpdate(room, membersInfo)
     if err != nil {
       return err
-      // if private chat and there are members left then don't remove the room
-    } else if room.OwnerID == "" && len(membersInfo) >= 1 {
+    }
+    // 2. defer room membership update notification
+    defer c.broadcastRoomUpdate(room, membersInfo)
+
+    // 3. if user is an owner of the chat room or there are no any active members left in the room
+    // then remove the room and cleanup its membership
+    if room.OwnerID == profileID || len(membersInfo) <= 1 {
+      if err := c.chatDB.DeleteRoom(roomID); err != nil {
+        return err
+      } else {
+        c.roomCache.EvictRoom(roomID)
+        for _, memberInfo := range membersInfo {
+          if err := c.memberInfoDB.DeleteMemberInfo(roomID, memberInfo.MemberID); err != nil {
+            log.Println("Unmable to delete member info roomID:", roomID, "memberID", memberInfo.MemberID)
+          }
+        }
+        return nil
+      }
+    } else {
+      // 4. if there are members left then just leave the room
+      if err := c.memberInfoDB.DeleteMemberInfo(roomID, profileID); err != nil {
+        return err
+      }
+    }
+
+    // 5. private chat should kep history if there is at least one member
+    if room.OwnerID == "" {
       return nil
-      // if not an owner then exit this room
-    } else if room.OwnerID != profileID && len(membersInfo) >= 1 {
-      log.Println("Exiting chat room", roomID, "by member", profileID)
+    } else {
+      // 6. if it's not a private chat but there are still members left then exclude member from room
+      log.Println("Exiting chat roomID:", roomID, "memberID:", profileID)
       if err := c.chatDB.RemoveRoomMember(roomID, profileID); err != nil {
         return err
       } else {
         return nil
       }
-    }
-    // if user is an owner of the chat room or there are no any active members left
-    if err := c.chatDB.DeleteRoom(roomID); err != nil {
-      return err
-    } else {
-      c.roomCache.EvictRoom(roomID)
-      return nil
     }
   }
 }
@@ -140,7 +155,7 @@ func (c *Chat) broadcastRoomUpdate(room *models.Room, membersInfo []models.Membe
   }
   c.connectionManager.Broadcast <- &BroadcastPackage{
     Message:  &models.Message{Type: "update", RoomID: room.ID},
-    Auditory: room.Members,
+    Auditory: memberIDs,
   }
 }
 
@@ -160,7 +175,7 @@ func (c *Chat) broadcastMessage(room *models.Room, message *models.Message) {
     if _, ok := roomInfoIdx[memberID]; !ok {
       newMemberInfo := models.MemberInfo{RoomID: room.ID, MemberID: memberID}
       if _, err := c.memberInfoDB.CreateMemberInfo(newMemberInfo); err != nil {
-        log.Println("Cannot create member info roomID:", room.ID,"memberID:", memberID, "err:", err)
+        log.Println("Cannot create member info roomID:", room.ID, "memberID:", memberID, "err:", err)
       }
     }
   }
