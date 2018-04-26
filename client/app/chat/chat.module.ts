@@ -30,6 +30,7 @@ import {MediaMatcher} from "@angular/cdk/layout";
 import {GroupComponent} from './group/group.component';
 import {ConfirmDialog} from "../common/confirm/confirm-dialog.component";
 import {LoaderComponent} from "../common/loader/loader.component";
+import {MarkdownModule, MarkedOptions} from "ngx-markdown";
 
 
 @NgModule({
@@ -64,7 +65,19 @@ import {LoaderComponent} from "../common/loader/loader.component";
     HttpClientModule,
     HttpClientXsrfModule,
     PickerModule,
-    EmojiModule
+    EmojiModule,
+    MarkdownModule.forRoot({
+      provide: MarkedOptions,
+      useValue: {
+        gfm: true,
+        tables: true,
+        breaks: true,
+        pedantic: true,
+        sanitize: true,
+        smartLists: true,
+        smartypants: true,
+      },
+    })
   ],
   providers: [
     MediaMatcher

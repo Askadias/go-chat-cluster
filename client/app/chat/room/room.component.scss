@@ -83,9 +83,12 @@
           .chat-message-from {
             position: absolute;
             bottom: 20px;
-            right: 10px;
             min-width: 52px;
             min-height: 52px;
+
+            left: 7px;
+            right: auto;
+            margin-left: 0;
 
             .chat-avatar-container {
               margin: 3px;
@@ -109,34 +112,50 @@
             }
           }
           .chat-message-text {
-            background: #4e4e4e;
+            background: #423c5d;
             border-radius: 6px;
-            padding: 8px 10px;
+            padding: 1px 10px;
             position: relative;
-            margin-right: 68px;
-            margin-left: 10px;
+            margin-left: 68px;
+            margin-right: 10px;
             top: 7px;
+            &::ng-deep > blockquote {
+              padding: 0 1em;
+              color: rgba(255, 255, 255, 0.535);
+              border-left: .25em solid rgba(255, 255, 255, 0.52);
+            }
+            &::ng-deep p {
+              margin: 5px 0;
+              > img {
+                max-width: 100%;
+              }
+              > code:not([class*=language-]) {
+                background: #272822;
+                border-radius: 2px;
+                color: #ff5d7e;
+                padding: 2px 4px;
+              }
+            }
           }
           .chat-message-timestamp {
             position: absolute;
             bottom: 5px;
             font-size: small;
-            right: 20px;
+            left: 20px;
           }
           &.mine {
             .chat-message-from {
-              left: 7px;
-              right: auto;
-              margin-left: 0;
+              left: auto;
+              right: 10px;
             }
             .chat-message-text {
-              background: #423c5d;
-              margin-left: 68px;
-              margin-right: 10px;
+              background: #4e4e4e;
+              margin-right: 68px;
+              margin-left: 10px;
             }
             .chat-message-timestamp {
-              right: initial;
-              left: 20px;
+              left: initial;
+              right: 20px;
             }
           }
 
@@ -148,12 +167,12 @@
                 position: absolute;
                 width: 0;
                 height: 0;
-                left: auto;
-                right: -19px;
+                right: auto;
+                left: -19px;
                 top: auto;
                 bottom: 0;
                 border: 20px solid;
-                border-color: transparent transparent #4e4e4e transparent;
+                border-color: transparent transparent #423c5d transparent;
               }
             }
 
@@ -164,12 +183,12 @@
                   position: absolute;
                   width: 0;
                   height: 0;
-                  right: auto;
-                  left: -19px;
+                  left: auto;
+                  right: -19px;
                   top: auto;
                   bottom: 0;
                   border: 20px solid;
-                  border-color: transparent transparent #423c5d transparent;
+                  border-color: transparent transparent #4e4e4e transparent;
                 }
               }
             }
