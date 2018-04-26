@@ -119,6 +119,7 @@
             margin-left: 68px;
             margin-right: 10px;
             top: 7px;
+            word-wrap: break-word;
             &::ng-deep > blockquote {
               padding: 0 1em;
               color: rgba(255, 255, 255, 0.535);
