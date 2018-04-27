@@ -12,6 +12,9 @@ export function isValidURL(str: string) {
     '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
   return pattern.test(str);
 }
+export function isImageURL(url: string) {
+  return(url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+}
 
 export function exponentialBackOff(errors) {
   return zip(

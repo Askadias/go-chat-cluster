@@ -64,7 +64,7 @@
               </ng-template>
             </div>
           </div>
-          <div class="chat-message-text" [innerHtml]="message.body | markdown"></div>
+          <div class="chat-message-text" (copy)="onCopy($event)" [innerHtml]="message.body | markdown"></div>
           <div class="chat-message-timestamp" *ngIf="isHeadMessage(message, i)">
             {{ getTimestamp(message) | date:'medium' }}
           </div>

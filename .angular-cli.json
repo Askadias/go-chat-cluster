@@ -25,7 +25,10 @@
         "../node_modules/prismjs/themes/prism-okaidia.css"
       ],
       "scripts": [
-        "../node_modules/prismjs/prism.js"
+        "../node_modules/prismjs/prism.js",
+        "../node_modules/anchorme/dist-node/index.js",
+        "../node_modules/turndown/dist/turndown.js",
+        "../node_modules/turndown-plugin-gfm/dist/turndown-plugin-gfm.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

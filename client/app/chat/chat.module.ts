@@ -73,6 +73,7 @@ import {MarkdownModule, MarkedOptions} from "ngx-markdown";
         tables: true,
         breaks: true,
         pedantic: true,
+        mangle: true,
         sanitize: true,
         smartLists: true,
         smartypants: true,

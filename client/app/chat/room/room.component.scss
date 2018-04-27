@@ -125,6 +125,10 @@
               color: rgba(255, 255, 255, 0.535);
               border-left: .25em solid rgba(255, 255, 255, 0.52);
             }
+            &::ng-deep > pre {
+              background: #272822;
+              overflow: auto;
+            }
             &::ng-deep p {
               margin: 5px 0;
               > img {

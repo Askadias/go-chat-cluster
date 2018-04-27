@@ -6,6 +6,10 @@ import {environment as env} from "../../../environments/environment";
 import {EmojiEvent} from "@ctrl/ngx-emoji-mart/ngx-emoji";
 import {ChatService} from "../../services/chat.service";
 import {scaleAnimation} from "../../animations/scale.animation";
+import TurndownService from 'turndown'
+import {gfm} from 'turndown-plugin-gfm'
+import anchorme from "anchorme";
+import {isImageURL} from '../../common/utils';
 
 @Component({
   selector: 'chat-room',
@@ -33,8 +37,13 @@ export class RoomComponent implements OnInit {
   emojiPickerOpened = false;
   initialized = false;
   showScrollDown = false;
+  turndownService = new TurndownService({
+    headingStyle: 'atx',
+    codeBlockStyle: 'fenced'
+  });
 
   constructor(private chat: ChatService) {
+    this.turndownService.use(gfm);
   }
 
   @Input()
@@ -102,10 +111,16 @@ export class RoomComponent implements OnInit {
   }
 
   sendMessage() {
-    if (this._room.newMessage !== '') {
+    let msg = this._room.newMessage;
+    if (msg !== '') {
       this.sending = true;
       this.errors = [];
-      this._room.chat.send(new Message(this._room.room.id, this._room.me.id, this._room.newMessage, Date.now()))
+      anchorme(msg, {list: true}).forEach(url => {
+        if (url && isImageURL(url.raw)) {
+          msg += `\n\r![](${url.raw})`
+        }
+      });
+      this._room.chat.send(new Message(this._room.room.id, this._room.me.id, msg, Date.now()))
         .subscribe(() => {
             this.sending = false;
           },
@@ -172,5 +187,30 @@ export class RoomComponent implements OnInit {
 
   isOwner() {
     return this._room.amIOwner()
+  }
+
+  onCopy(e: ClipboardEvent) {
+    e.clipboardData.setData('text/plain', this.turndownService.turndown(this.getHTMLOfSelection()));
+    e.preventDefault();
+  }
+
+  getHTMLOfSelection() {
+    let range;
+    if (window.getSelection) {
+      let selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        range = selection.getRangeAt(0);
+        let clonedSelection = range.cloneContents();
+        let div = document.createElement('div');
+        div.appendChild(clonedSelection);
+        return div.innerHTML;
+      }
+      else {
+        return '';
+      }
+    }
+    else {
+      return '';
+    }
   }
 }
