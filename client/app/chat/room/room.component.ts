@@ -83,7 +83,7 @@ export class RoomComponent implements OnInit {
             setTimeout(() => {
               const native = this.chatLogContainer.nativeElement;
               native.scrollTop = native.scrollHeight;
-            });
+            }, 100);
           } else {
             setTimeout(() => {
               const native = this.chatLogContainer.nativeElement;
