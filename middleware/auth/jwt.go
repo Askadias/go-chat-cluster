@@ -58,6 +58,7 @@ type JWTMiddleware struct {
 }
 
 func OnError(w http.ResponseWriter, err string) {
+
   http.Error(w, err, http.StatusUnauthorized)
 }
 

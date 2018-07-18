@@ -6,6 +6,8 @@ import (
 )
 
 type Account interface {
+
   GetProfile(accessToken string) (*models.User, *conf.ApiError)
+
   GetUser(profileID string) (*models.User, *conf.ApiError)
 }

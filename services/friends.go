@@ -6,6 +6,8 @@ import (
 )
 
 type Friends interface {
+
   GetFriends(profileID string) ([]models.User, *conf.ApiError)
+
   HasFriendsPermissions(profileID string) *conf.ApiError
 }

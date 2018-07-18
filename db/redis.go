@@ -7,6 +7,7 @@ import (
 )
 
 func NewRedisPool(options conf.RedisConf) *redis.Pool {
+
   return &redis.Pool{
     MaxIdle:     options.MaxIdle,
     MaxActive:   options.MaxActive,

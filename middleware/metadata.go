@@ -15,6 +15,7 @@ type DeviceID string
 type RequestID string
 
 func Metadata() martini.Handler {
+
   return func(c martini.Context, req *http.Request, w http.ResponseWriter) {
     requestID := req.Header.Get(RequestIdHeader)
     deviceID := ""

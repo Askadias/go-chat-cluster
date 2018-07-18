@@ -17,6 +17,7 @@ type FBError struct {
 type FBPermissionsResponse struct {
   data []FBPermission
 }
+
 type FBPermission struct {
   permission string
   status     string
