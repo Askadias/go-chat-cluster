@@ -1,13 +1,13 @@
 package services
 
 import (
+  "github.com/Askadias/go-chat-cluster/conf"
+  "github.com/Askadias/go-chat-cluster/models"
   . "github.com/onsi/ginkgo"
   . "github.com/onsi/gomega"
-  "github.com/Askadias/go-chat-cluster/conf"
-  "time"
-  "net/http"
   "github.com/onsi/gomega/ghttp"
-  "github.com/Askadias/go-chat-cluster/models"
+  "net/http"
+  "time"
 )
 
 var _ = Describe("Facebook API Client", func() {

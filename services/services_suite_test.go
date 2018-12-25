@@ -1,9 +1,9 @@
 package services
 
 import (
-	"testing"
   . "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+  . "github.com/onsi/gomega"
+  "testing"
 )
 
 func TestServices(t *testing.T) {

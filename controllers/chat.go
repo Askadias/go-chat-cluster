@@ -1,18 +1,18 @@
 package controllers
 
 import (
-  "net/http"
-  "github.com/gorilla/websocket"
-  "github.com/Askadias/go-chat-cluster/services"
-  "github.com/dgrijalva/jwt-go"
-  "github.com/codegangsta/martini-contrib/render"
   "github.com/Askadias/go-chat-cluster/conf"
-  "log"
-  "github.com/Askadias/go-chat-cluster/models"
-  "time"
-  "github.com/go-martini/martini"
-  "strconv"
   "github.com/Askadias/go-chat-cluster/middleware"
+  "github.com/Askadias/go-chat-cluster/models"
+  "github.com/Askadias/go-chat-cluster/services"
+  "github.com/codegangsta/martini-contrib/render"
+  "github.com/dgrijalva/jwt-go"
+  "github.com/go-martini/martini"
+  "github.com/gorilla/websocket"
+  "log"
+  "net/http"
+  "strconv"
+  "time"
 )
 
 var upgrader = websocket.Upgrader{
