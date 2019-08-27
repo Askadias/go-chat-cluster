@@ -19,7 +19,7 @@ func NewApiError(err error) *ApiError {
 
 var (
   ErrAccountNotLoggedIn   = &ApiError{1, http.StatusUnauthorized, "Not logged in"}
-  ErrInvalidToken         = &ApiError{2, http.StatusUnauthorized, "Access Toke is invalid"}
+  ErrInvalidToken         = &ApiError{2, http.StatusUnauthorized, "Access Token is invalid"}
   ErrNoProfile            = &ApiError{3, http.StatusBadRequest, "Failed to get user profile"}
   ErrFriendsNoPermissions = &ApiError{4, http.StatusForbidden, "No permissions to fetch friends"}
   ErrNotAnOwner           = &ApiError{5, http.StatusForbidden, "Sorry, only owner can modify a chat room"}
